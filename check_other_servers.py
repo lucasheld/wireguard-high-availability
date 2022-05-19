@@ -1,8 +1,9 @@
+import os
 import requests
 from hcloud import Client
 
 
-API_TOKEN = "ZUmwoCyaSyHzoYbnjtDMecS1rLXXaboLJ4ZIppaVQJjbKInvty5O82V7KlHra3AS"
+API_TOKEN = os.environ['HETZNER_API_TOKEN']
 FLOATING_IP_NAME = "wg-floating"
 OTHER_SERVER_IPS = ["49.12.232.10", "78.47.156.66"]
 
