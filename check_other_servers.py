@@ -39,7 +39,7 @@ def main():
         server = get_healthy_server(client, current_ip)
         if server:
             client.floating_ips.assign(floating_ip, server)
-            print(f"floating ip assigned to server {server.data_model.name}")
+            print(f"floating ip assigned to {server.data_model.name}")
         else:
             print("no healthy server available")
 
