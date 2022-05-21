@@ -1,0 +1,9 @@
+---
+- name: copy floating ip interface config
+  template:
+    src: 60-floating-ip.cfg.j2
+    dest: /etc/network/interfaces.d/60-floating-ip.cfg
+    mode: 0644
+    force: yes
+  notify:
+    - restart networking

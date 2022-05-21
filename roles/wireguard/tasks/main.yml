@@ -1,0 +1,34 @@
+---
+- name: add debian backports repository
+  apt_repository:
+    repo: deb http://deb.debian.org/debian buster-backports main
+    state: present
+    mode: 0644
+
+- name: install linux-headers and wireguard
+  apt:
+    name:
+      - linux-headers-amd64
+      - wireguard
+    state: latest
+    update_cache: yes
+
+- name: copy wireguard config
+  template:
+    src: wg0.conf.j2
+    dest: /etc/wireguard/wg0.conf
+    mode: 0644
+    force: yes
+
+- name: sysctl set net.ipv4.ip_forward to 1
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    reload: yes
+
+- name: enable wireguard service
+  systemd:
+    name: wg-quick@wg0.service
+    enabled: yes
+    state: started

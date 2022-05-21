@@ -1,0 +1,15 @@
+---
+- hosts: servers
+  become: yes
+  tasks:
+    - include_role:
+        name: firewall
+    
+    - include_role:
+        name: floating-ip
+    
+    - include_role:
+        name: monitoring
+
+    - include_role:
+        name: wireguard

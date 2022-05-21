@@ -1,11 +1,16 @@
-import os
+#!/usr/bin/env python3
 import requests
 from hcloud import Client
 
 
-API_TOKEN = os.environ['HETZNER_API_TOKEN']
-FLOATING_IP_NAME = "wg-floating"
-OTHER_SERVER_IPS = ["49.12.232.10", "78.47.156.66"]
+# import os
+# API_TOKEN = os.environ['HETZNER_API_TOKEN']
+# FLOATING_IP_NAME = "wg-floating"
+# OTHER_SERVER_IPS = ["49.12.232.10", "78.47.156.66"]
+
+API_TOKEN = "{{ hetzner.api_token }}"
+FLOATING_IP_NAME = "{{ hetzner.floating_ip.name }}"
+OTHER_SERVER_IPS = {{ hostvars[inventory_hostname]['groups']['servers'] }}
 
 
 def get_server_by_ip(client, ip):
@@ -17,8 +22,11 @@ def get_server_by_ip(client, ip):
 
 def is_healthy(ip):
     url = f"http://{ip}"
-    r = requests.get(url)
-    return r.ok
+    try:
+        r = requests.get(url, timeout=10)
+        return r.ok
+    except:
+        return False
 
 
 def get_healthy_server(client, current_ip):

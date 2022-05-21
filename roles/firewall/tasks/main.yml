@@ -1,0 +1,27 @@
+---
+- name: install ufw
+  apt:
+    name:
+      - ufw
+    state: latest
+    update_cache: yes
+
+- name: ufw allow ssh
+  community.general.ufw:
+    rule: allow
+    port: ssh
+
+- name: ufw allow wireguard
+  community.general.ufw:
+    rule: allow
+    port: 51820
+    proto: udp
+
+- name: ufw allow health check
+  community.general.ufw:
+    rule: allow
+    port: http
+
+- name: ufw enable
+  community.general.ufw:
+    state: enabled
