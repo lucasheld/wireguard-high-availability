@@ -1,13 +1,13 @@
 ---
 - name: copy check_other_servers.py
-  template:
+  ansible.builtin.template:
     src: check_other_servers.py.j2
     dest: /root/check_other_servers.py
     mode: 0744
     force: yes
 
 - name: install setuptools and pip
-  apt:
+  ansible.builtin.apt:
     name:
       - python3-setuptools
       - python3-pip
@@ -15,17 +15,17 @@
     update_cache: yes
 
 - name: install hcloud python package
-  pip:
+  ansible.builtin.pip:
     name: hcloud==1.16.0
 
 - name: copy health_check.py
-  copy:
+  ansible.builtin.copy:
     src: health_check.py
     dest: /root/health_check.py
     mode: 0744
 
 - name: copy health_check service
-  copy:
+  ansible.builtin.copy:
     src: health_check.service
     dest: /etc/systemd/system/health_check.service
     mode: 0644
@@ -38,6 +38,6 @@
     enabled: yes    
 
 - name: create check_other_servers cronjob
-  cron:
+  ansible.builtin.cron:
     name: check_other_servers
     job: sleep $(( RANDOM \% 60 )) && /root/check_other_servers.py

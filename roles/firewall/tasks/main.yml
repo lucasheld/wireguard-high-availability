@@ -1,6 +1,6 @@
 ---
 - name: install ufw
-  apt:
+  ansible.builtin.apt:
     name:
       - ufw
     state: latest

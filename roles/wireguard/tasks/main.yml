@@ -1,12 +1,12 @@
 ---
 - name: add debian backports repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: deb http://deb.debian.org/debian buster-backports main
     state: present
     mode: 0644
 
 - name: install linux-headers and wireguard
-  apt:
+  ansible.builtin.apt:
     name:
       - linux-headers-amd64
       - wireguard
@@ -14,7 +14,7 @@
     update_cache: yes
 
 - name: copy wireguard config
-  template:
+  ansible.builtin.template:
     src: wg0.conf.j2
     dest: /etc/wireguard/wg0.conf
     mode: 0644
@@ -28,7 +28,7 @@
     reload: yes
 
 - name: enable wireguard service
-  systemd:
+  ansible.builtin.systemd:
     name: wg-quick@wg0.service
     enabled: yes
     state: started
