@@ -1,0 +1,1 @@
+# wg-high-availability

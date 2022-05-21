@@ -20,6 +20,15 @@ def is_healthy(ip):
         return False
 
 
+def get_floating_ip_server(client, floating_ip):
+    servers = client.servers.get_all()
+    for server in servers:
+        floating_ips = server.data_model.public_net.floating_ips
+        for floating_ip_1 in floating_ips:
+            if floating_ip_1.data_model.id == floating_ip.data_model.id:
+                return server
+
+
 def get_healthy_server(client, current_ip, server_ips):
     for new_ip in server_ips:
         if new_ip != current_ip and is_healthy(new_ip):
@@ -44,7 +53,8 @@ def main():
     client = Client(token=token)
 
     floating_ip = client.floating_ips.get_by_name(floating_ip_name)
-    current_ip = floating_ip.data_model.ip
+    current_server = get_floating_ip_server(client, floating_ip)
+    current_ip = current_server.data_model.public_net.ipv4.ip
 
     if is_healthy(current_ip):
         print(f"current server healthy")
