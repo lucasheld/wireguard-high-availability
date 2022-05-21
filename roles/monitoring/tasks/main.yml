@@ -1,10 +1,9 @@
 ---
 - name: copy check_other_servers.py
-  ansible.builtin.template:
-    src: check_other_servers.py.j2
+  ansible.builtin.copy:
+    src: check_other_servers.py
     dest: /root/check_other_servers.py
     mode: 0744
-    force: yes
 
 - name: install setuptools and pip
   ansible.builtin.apt:
@@ -25,8 +24,8 @@
     mode: 0744
 
 - name: copy health_check service
-  ansible.builtin.copy:
-    src: health_check.service
+  ansible.builtin.template:
+    src: health_check.service.j2
     dest: /etc/systemd/system/health_check.service
     mode: 0644
 
@@ -35,9 +34,9 @@
     name: health_check
     daemon_reload: yes
     state: started
-    enabled: yes    
+    enabled: yes
 
 - name: create check_other_servers cronjob
   ansible.builtin.cron:
     name: check_other_servers
-    job: sleep $(( RANDOM \% 60 )) && /root/check_other_servers.py
+    job: sleep $(( RANDOM \% 60 )) && /root/check_other_servers.py --token "{{ hetzner.api_token }}" --floating-ip-name "{{ hetzner.floating_ip.name }}" --server-ips {{ hostvars[inventory_hostname]['groups']['servers'] | join(' ') }}

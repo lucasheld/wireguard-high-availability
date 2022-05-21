@@ -15,10 +15,9 @@
 
 - name: copy wireguard config
   ansible.builtin.template:
-    src: wg0.conf.j2
-    dest: /etc/wireguard/wg0.conf
+    src: "{{ wireguard.network_interface }}.conf.j2"
+    dest: "/etc/wireguard/{{ wireguard.network_interface }}.conf"
     mode: 0644
-    force: yes
 
 - name: sysctl set net.ipv4.ip_forward to 1
   ansible.posix.sysctl:
@@ -29,6 +28,6 @@
 
 - name: enable wireguard service
   ansible.builtin.systemd:
-    name: wg-quick@wg0.service
+    name: "wg-quick@{{ wireguard.network_interface }}.service"
     enabled: yes
     state: started

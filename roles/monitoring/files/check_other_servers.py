@@ -1,16 +1,7 @@
 #!/usr/bin/env python3
+import argparse
 import requests
 from hcloud import Client
-
-
-# import os
-# API_TOKEN = os.environ['HETZNER_API_TOKEN']
-# FLOATING_IP_NAME = "wg-floating"
-# OTHER_SERVER_IPS = ["49.12.232.10", "78.47.156.66"]
-
-API_TOKEN = "{{ hetzner.api_token }}"
-FLOATING_IP_NAME = "{{ hetzner.floating_ip.name }}"
-OTHER_SERVER_IPS = {{ hostvars[inventory_hostname]['groups']['servers'] }}
 
 
 def get_server_by_ip(client, ip):
@@ -29,23 +20,37 @@ def is_healthy(ip):
         return False
 
 
-def get_healthy_server(client, current_ip):
-    for new_ip in OTHER_SERVER_IPS:
+def get_healthy_server(client, current_ip, server_ips):
+    for new_ip in server_ips:
         if new_ip != current_ip and is_healthy(new_ip):
             return get_server_by_ip(client, new_ip)
 
 
-def main():
-    client = Client(token=API_TOKEN)
+def get_args():
+    parser = argparse.ArgumentParser(description="wireguard server check")
+    parser.add_argument("--token", required=True, help="hetzner api token")
+    parser.add_argument("--floating-ip-name", required=True, help="floating ip name")
+    parser.add_argument("--server-ips", nargs='*', required=True, help="server ips")
+    args = parser.parse_args()
+    return args
 
-    floating_ip = client.floating_ips.get_by_name(FLOATING_IP_NAME)
+
+def main():
+    args = get_args()
+    token = args.token
+    floating_ip_name = args.floating_ip_name
+    server_ips = args.server_ips
+
+    client = Client(token=token)
+
+    floating_ip = client.floating_ips.get_by_name(floating_ip_name)
     current_ip = floating_ip.data_model.ip
 
     if is_healthy(current_ip):
         print(f"current server healthy")
     else:
         print(f"current server unhealthy")
-        server = get_healthy_server(client, current_ip)
+        server = get_healthy_server(client, current_ip, server_ips)
         if server:
             client.floating_ips.assign(floating_ip, server)
             print(f"floating ip assigned to {server.data_model.name}")
