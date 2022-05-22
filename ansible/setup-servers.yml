@@ -1,7 +1,18 @@
 ---
+- name: get floating ip by name
+  hosts: localhost
+  connection: local 
+  tasks:
+    - include_role:
+        name: floating-ip
+        tasks_from: get-ip
+
 - hosts: servers
   become: yes
   tasks:
+    - set_fact:
+        floating_ip: "{{ hostvars['localhost'].floating_ip }}"
+
     - include_role:
         name: firewall
     
