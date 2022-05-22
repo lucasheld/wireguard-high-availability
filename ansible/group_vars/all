@@ -12,7 +12,7 @@ hetzner:
     65613861383031316538
 
   floating_ip:
-    name: wg-floating
+    name: wireguard-floating
     ip: 195.201.250.192
 
 wireguard:
