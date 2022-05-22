@@ -11,13 +11,17 @@ variable "location" {
   default = "nbg1"
 }
 
+variable "server-count" {
+  default = "2"
+}
+
 resource "hcloud_ssh_key" "default" {
   name       = "hcloud_ssh_key"
   public_key = file("~/.ssh/id_rsa.pub")
 }
 
 resource "hcloud_server" "wireguard" {
-  count       = "2"
+  count       = var.server-count
   name        = "wireguard-${count.index}"
   image       = "debian-11"
   server_type = "cx11"
