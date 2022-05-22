@@ -1,14 +1,7 @@
 ---
-- name: add debian backports repository
-  ansible.builtin.apt_repository:
-    repo: deb http://deb.debian.org/debian buster-backports main
-    state: present
-    mode: 0644
-
-- name: install linux-headers and wireguard
+- name: install wireguard
   ansible.builtin.apt:
     name:
-      - linux-headers-amd64
       - wireguard
     state: latest
     update_cache: yes
