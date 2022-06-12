@@ -38,7 +38,8 @@ def get_healthy_server(client, current_ip, server_ips):
 def get_args():
     parser = argparse.ArgumentParser(description="wireguard server check")
     parser.add_argument("--token", required=True, help="hetzner api token")
-    parser.add_argument("--floating-ip-name", required=True, help="floating ip name")
+    parser.add_argument("--floating-ipv4", required=True, help="floating ipv4 name")
+    parser.add_argument("--floating-ipv6", help="floating ipv6 name")
     parser.add_argument("--server-ips", nargs='*', required=True, help="server ips")
     args = parser.parse_args()
     return args
@@ -47,13 +48,14 @@ def get_args():
 def main():
     args = get_args()
     token = args.token
-    floating_ip_name = args.floating_ip_name
+    floating_ipv4 = args.floating_ipv4
+    floating_ipv6 = args.floating_ipv6
     server_ips = args.server_ips
 
     client = Client(token=token)
 
-    floating_ip = client.floating_ips.get_by_name(floating_ip_name)
-    current_server = get_floating_ip_server(client, floating_ip)
+    floating_ipv4 = client.floating_ips.get_by_name(floating_ipv4)
+    current_server = get_floating_ip_server(client, floating_ipv4)
     current_ip = current_server.data_model.public_net.ipv4.ip
 
     if is_healthy(current_ip):
@@ -62,8 +64,12 @@ def main():
         print(f"current server unhealthy")
         server = get_healthy_server(client, current_ip, server_ips)
         if server:
-            client.floating_ips.assign(floating_ip, server)
-            print(f"floating ip assigned to {server.data_model.name}")
+            client.floating_ips.assign(floating_ipv4, server)
+            print(f"floating ipv4 assigned to {server.data_model.name}")
+            if floating_ipv6:
+                floating_ipv6 = client.floating_ips.get_by_name(floating_ipv6)
+                client.floating_ips.assign(floating_ipv6, server)
+                print(f"floating ipv6 assigned to {server.data_model.name}")
         else:
             print("no healthy server available")
 

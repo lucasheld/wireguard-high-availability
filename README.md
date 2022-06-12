@@ -13,3 +13,20 @@
 ```bash
 ansible-playbook setup-servers.yml -u root
 ```
+
+
+
+
+# Notes
+
+floating ipv6 nutzen
+--------------------
+wird nur gebraucht, wenn keine ipv4 am client vorhanden ist
+nur die verbindung wird darüber aufgebaut, danach bekommt der client eine ipv4 und ipv6, egal ob der client vorher eine ipv4 oder ipv6 bessessen hat
+
+wenn floating ip
+2a01:4f8:1c0c:a058::/64
+dann
+Endpoint = [2a01:4f8:1c0c:a058::]:51820
+
+

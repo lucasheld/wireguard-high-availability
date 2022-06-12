@@ -39,4 +39,4 @@
 - name: create check_other_servers cronjob
   ansible.builtin.cron:
     name: check_other_servers
-    job: sleep $(( RANDOM \% 60 )) && /root/check_other_servers.py --token "{{ hetzner.api_token }}" --floating-ip-name "{{ hetzner.floating_ip_name }}" --server-ips {{ hostvars[inventory_hostname]['groups']['servers'] | join(' ') }}
+    job: sleep $(( RANDOM \% 60 )) && /root/check_other_servers.py --token "{{ hetzner.api_token }}" --floating-ipv4 "{{ hetzner.floating_ipv4 }}" --floating-ipv6 "{{ hetzner.floating_ipv6 | default('') }}" --server-ips {{ hostvars[inventory_hostname]['groups']['servers'] | join(' ') }}

@@ -1,4 +1,9 @@
 auto eth0:1
 iface eth0:1 inet static
-    address {{ floating_ip }}
+    address {{ floating_ipv4 }}
     netmask 32
+{% if hetzner.floating_ipv6 | default(false) %}
+iface eth0:1 inet6 static
+    address {{ floating_ipv6 }}
+    netmask 64
+{% endif %}

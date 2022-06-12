@@ -29,8 +29,14 @@ resource "hcloud_server" "wireguard" {
   ssh_keys    = [hcloud_ssh_key.default.id]
 }
 
-resource "hcloud_floating_ip" "master" {
+resource "hcloud_floating_ip" "floating-ipv4" {
   type      = "ipv4"
-  name      = "wireguard-floating"
+  name      = "wireguard-floating-ipv4"
+  server_id = hcloud_server.wireguard[0].id
+}
+
+resource "hcloud_floating_ip" "floating-ipv6" {
+  type      = "ipv6"
+  name      = "wireguard-floating-ipv6"
   server_id = hcloud_server.wireguard[0].id
 }

@@ -10,8 +10,12 @@
 - hosts: servers
   become: yes
   tasks:
-    - set_fact:
-        floating_ip: "{{ hostvars['localhost'].floating_ip }}"
+    - ansible.builtin.set_fact:
+        floating_ipv4: "{{ hostvars['localhost'].floating_ipv4 }}"
+    
+    - ansible.builtin.set_fact:
+        floating_ipv6: "{{ hostvars['localhost'].floating_ipv6 }}"
+      when: hetzner.floating_ipv6 is defined
 
     - include_role:
         name: firewall

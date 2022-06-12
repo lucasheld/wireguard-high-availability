@@ -12,13 +12,6 @@
     dest: "/etc/wireguard/{{ wireguard.network_interface }}.conf"
     mode: 0644
 
-- name: sysctl set net.ipv4.ip_forward to 1
-  ansible.posix.sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    sysctl_set: yes
-    reload: yes
-
 - name: enable wireguard service
   ansible.builtin.systemd:
     name: "wg-quick@{{ wireguard.network_interface }}.service"

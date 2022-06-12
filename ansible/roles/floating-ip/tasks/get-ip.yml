@@ -9,4 +9,8 @@
   register: uri_data
 
 - ansible.builtin.set_fact:
-    floating_ip: "{{ (uri_data.json.floating_ips | selectattr('name', '==', hetzner.floating_ip_name) | first).ip }}"
+    floating_ipv4: "{{ (uri_data.json.floating_ips | selectattr('name', '==', hetzner.floating_ipv4) | first).ip }}"
+
+- ansible.builtin.set_fact:
+    floating_ipv6: "{{ (uri_data.json.floating_ips | selectattr('name', '==', hetzner.floating_ipv6) | first).ip }}"
+  when: hetzner.floating_ipv6 is defined
