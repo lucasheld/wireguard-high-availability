@@ -12,7 +12,7 @@ hetzner:
     65613861383031316538
 
   floating_ipv4: wireguard-floating-ipv4
-  floating_ipv6: wireguard-floating-ipv6
+  # floating_ipv6: wireguard-floating-ipv6
 
 wireguard:
   network_interface: wg0

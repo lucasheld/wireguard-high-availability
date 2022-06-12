@@ -35,8 +35,8 @@ resource "hcloud_floating_ip" "floating-ipv4" {
   server_id = hcloud_server.wireguard[0].id
 }
 
-resource "hcloud_floating_ip" "floating-ipv6" {
-  type      = "ipv6"
-  name      = "wireguard-floating-ipv6"
-  server_id = hcloud_server.wireguard[0].id
-}
+# resource "hcloud_floating_ip" "floating-ipv6" {
+#   type      = "ipv6"
+#   name      = "wireguard-floating-ipv6"
+#   server_id = hcloud_server.wireguard[0].id
+# }
