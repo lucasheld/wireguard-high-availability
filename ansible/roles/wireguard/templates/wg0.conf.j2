@@ -2,9 +2,81 @@
 Address = 10.0.0.1/24, fdc9:281f:04d7:9ee9::1/64
 ListenPort = 51820
 PrivateKey = {{ wireguard.interface.private_key }}
-PostUp = sysctl -w net.ipv4.ip_forward=1; sysctl -w net.ipv6.conf.all.forwarding=1; iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i %i -j ACCEPT; ip6tables -A FORWARD -o %i -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i %i -j ACCEPT; ip6tables -D FORWARD -o %i -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
+# enable IP forwarding
+PreUp = sysctl -w net.ipv4.ip_forward=1
+PreUp = sysctl -w net.ipv6.conf.all.forwarding=1
+
+# allow requests to wireguard server
+PreUp = iptables -I INPUT -p udp --dport 51820 -j ACCEPT
+PreUp = ip6tables -I INPUT -p udp --dport 51820 -j ACCEPT
+
+# create chain
+PreUp = iptables -N wg0-filter
+PreUp = ip6tables -N wg0-filter6
+
+# redirect traffic from wg0 interface to chain
+PreUp = iptables -I INPUT -i wg0 -j wg0-filter
+PreUp = iptables -I FORWARD -i wg0 -j wg0-filter
+PreUp = iptables -I FORWARD -o wg0 -j wg0-filter
+PreUp = iptables -I OUTPUT -o wg0 -j wg0-filter
+PreUp = ip6tables -I INPUT -i wg0 -j wg0-filter6
+PreUp = ip6tables -I FORWARD -i wg0 -j wg0-filter6
+PreUp = ip6tables -I FORWARD -o wg0 -j wg0-filter6
+PreUp = ip6tables -I OUTPUT -o wg0 -j wg0-filter6
+
+# allow already opened connections
+PreUp = iptables -A wg0-filter -m state --state ESTABLISHED,RELATED -j ACCEPT
+PreUp = ip6tables -A wg0-filter6 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# allow requests within the same subnet
+{% for subnet in subnets %}
+{% if subnet.type == 'ipv4' %}
+PreUp = iptables -A wg0-filter -s {{ subnet.subnet }} -d {{ subnet.subnet }} -j ACCEPT
+{% elif subnet.type == 'ipv6' %}
+PreUp = ip6tables -A wg0-filter6 -s {{ subnet.subnet }} -d {{ subnet.subnet }} -j ACCEPT
+{% endif %}
+{% endfor %}
+
+# allow requests based on custom rules
+{% for rule in wireguard.custom_rules %}
+{% if rule.type == 'ipv4' %}
+PreUp = iptables -A wg0-filter -s {{ rule.src }} -d {{ rule.dst }} -j ACCEPT
+{% elif rule.type == 'ipv6' %}
+PreUp = ip6tables -A wg0-filter6 -s {{ rule.src }} -d {{ rule.dst }} -j ACCEPT
+{% endif %}
+{% endfor %}
+
+# reject everything else
+PreUp = iptables -A wg0-filter -j REJECT
+PreUp = ip6tables -A wg0-filter6 -j REJECT
+
+# delete allow rule to wireguard server
+PostDown = iptables -D INPUT -p udp --dport 51820 -j ACCEPT
+PostDown = ip6tables -D INPUT -p udp --dport 51820 -j ACCEPT
+
+# delete traffic redirection rules
+PostDown = iptables -D INPUT -i wg0 -j wg0-filter
+PostDown = iptables -D FORWARD -i wg0 -j wg0-filter
+PostDown = iptables -D FORWARD -o wg0 -j wg0-filter
+PostDown = iptables -D OUTPUT -o wg0 -j wg0-filter
+PostDown = ip6tables -D INPUT -i wg0 -j wg0-filter6
+PostDown = ip6tables -D FORWARD -i wg0 -j wg0-filter6
+PostDown = ip6tables -D FORWARD -o wg0 -j wg0-filter6
+PostDown = ip6tables -D OUTPUT -o wg0 -j wg0-filter6
+
+# remove rules from chain
+PostDown = iptables -F wg0-filter
+PostDown = ip6tables -F wg0-filter6
+
+# remove chain
+PostDown = iptables -X wg0-filter
+PostDown = ip6tables -X wg0-filter6
+
+
+{% for peer in wireguard.peers %}
 [Peer]
-PublicKey = {{ wireguard.peer.public_key }}
-AllowedIPs = 10.0.0.2/32, fdc9:281f:04d7:9ee9::2/128
+PublicKey = {{ peer.public_key }}
+AllowedIPs = {{ peer.allowed_ips | join(', ') }}
+
+{% endfor %}

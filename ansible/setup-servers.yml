@@ -28,3 +28,7 @@
 
     - include_role:
         name: wireguard
+        tasks_from: generate_subnets
+
+    - include_role:
+        name: wireguard

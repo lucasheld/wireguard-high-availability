@@ -26,6 +26,28 @@ wireguard:
       3331383466366339370a363166656334623834316363666538376632633532646232613939303463
       32313339663064303638653864303761626335663838393636373338346431313363313064393438
       3962616233613035643331663466626435353163333339613362
-  
-  peer:
-    public_key: BE7nnqPQkPc9/1Q1XASpwYyjWFPf8gH01KnLWLRjym8=
+
+  peers:
+    - public_key: BE7nnqPQkPc9/1Q1XASpwYyjWFPf8gH01KnLWLRjym8=
+      allowed_ips:
+        - 10.0.1.1/32
+        - fdc9:281f:4d7:9ee9::1:1/128
+    
+    - public_key: /b5Du40LNKkaejkKzgT8VQTf07+1T7OdkilzS7pmp0E=
+      allowed_ips:
+        - 10.0.1.2/32
+        - fdc9:281f:4d7:9ee9::1:2/128
+    
+    - public_key: 7TDPXQcFMfsK5RX//lUVceikQWBmvtqawSbZLODvRHI=
+      allowed_ips:
+        - 10.0.2.1/32
+        - fdc9:281f:4d7:9ee9::2:1/128
+
+  custom_rules:
+    - src: 10.0.1.0/24
+      dst: 10.0.2.0/24
+      type: ipv4
+
+    - src: fdc9:281f:4d7:9ee9::1:0/64
+      dst: fdc9:281f:4d7:9ee9::2:0/64
+      type: ipv6

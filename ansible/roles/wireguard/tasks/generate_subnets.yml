@@ -1,0 +1,13 @@
+---
+- name: execute script
+  script: generate_subnets.py
+  register: python_result
+  environment:
+    ANSIBLE_WIREGUARD_PEERS: "{{ wireguard.peers | to_json }}"
+
+- name: Get stdout or stderr from the output
+  set_fact:
+    subnets: "{{ python_result.stdout | from_json }}"
+
+# - debug:
+    # var: subnets
