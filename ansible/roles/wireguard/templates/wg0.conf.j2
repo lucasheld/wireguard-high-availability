@@ -32,9 +32,9 @@ PreUp = ip6tables -A wg0-filter6 -m state --state ESTABLISHED,RELATED -j ACCEPT
 # allow requests within the same subnet
 {% for subnet in subnets %}
 {% if subnet.type == 'ipv4' %}
-PreUp = iptables -A wg0-filter -s {{ subnet.subnet }} -d {{ subnet.subnet }} -j ACCEPT
+PreUp = iptables -A wg0-filter -s {{ subnet.network }} -d {{ subnet.network }} -j ACCEPT
 {% elif subnet.type == 'ipv6' %}
-PreUp = ip6tables -A wg0-filter6 -s {{ subnet.subnet }} -d {{ subnet.subnet }} -j ACCEPT
+PreUp = ip6tables -A wg0-filter6 -s {{ subnet.network }} -d {{ subnet.network }} -j ACCEPT
 {% endif %}
 {% endfor %}
 

@@ -4,9 +4,13 @@ import json
 import ipaddress
 
 
-def validIPAddress(IP):
+IPV4_PREFIX = 24
+IPV6_PREFIX = 112
+
+
+def get_ip_version(ip_address):
     try:
-        return "ipv4" if type(ipaddress.ip_address(IP)) is ipaddress.IPv4Address else "ipv6"
+        return "ipv4" if type(ipaddress.ip_address(ip_address)) is ipaddress.IPv4Address else "ipv6"
     except ValueError:
         return
 
@@ -17,14 +21,14 @@ subnets = []
 for peer in peers:
     for allowed_ip in peer["allowed_ips"]:
         ip = allowed_ip.split("/")[0]
-        ip_version = validIPAddress(ip)
+        ip_version = get_ip_version(ip)
         if ip_version:
-            sub = "24" if ip_version == "ipv4" else "64"
-            subnet = f"{ip[:-1]}0/{sub}"
-            if subnet not in [i["subnet"] for i in subnets]:
+            prefix = IPV4_PREFIX if ip_version == "ipv4" else IPV6_PREFIX
+            network = f"{ip[:-1]}0/{prefix}"
+            if network not in [i["network"] for i in subnets]:
                 subnets.append({
                     "type": ip_version,
-                    "subnet": subnet
+                    "network": network
                 })
 
 print(json.dumps(subnets))
