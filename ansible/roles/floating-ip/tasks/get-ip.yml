@@ -1,16 +1,16 @@
 ---
-- name: get floating ip name
+- name: get floating ip information from hetzner
   ansible.builtin.uri:
     url: https://api.hetzner.cloud/v1/floating_ips
     method: GET
     headers:
       Authorization: "Bearer {{ hetzner.api_token }}"
     return_content: yes
-  register: uri_data
+  register: floating_ip_data
 
 - ansible.builtin.set_fact:
-    floating_ipv4: "{{ (uri_data.json.floating_ips | selectattr('name', '==', hetzner.floating_ipv4) | first).ip }}"
+    floating_ipv4: "{{ (floating_ip_data.json.floating_ips | selectattr('name', '==', hetzner.floating_ipv4) | first).ip }}"
 
 - ansible.builtin.set_fact:
-    floating_ipv6: "{{ (uri_data.json.floating_ips | selectattr('name', '==', hetzner.floating_ipv6) | first).ip }}"
+    floating_ipv6: "{{ (floating_ip_data.json.floating_ips | selectattr('name', '==', hetzner.floating_ipv6) | first).ip }}"
   when: hetzner.floating_ipv6 is defined

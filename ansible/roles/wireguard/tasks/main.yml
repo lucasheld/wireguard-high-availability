@@ -12,7 +12,7 @@
     dest: "/etc/wireguard/{{ wireguard.network_interface }}.conf"
     mode: 0644
 
-- name: enable wireguard service
+- name: enable and start wireguard service
   ansible.builtin.systemd:
     name: "wg-quick@{{ wireguard.network_interface }}.service"
     enabled: yes

@@ -1,10 +1,8 @@
 ---
 - name: generate wireguard subnets
-  script: generate_subnets.py
-  register: python_result
-  environment:
-    ANSIBLE_WIREGUARD_PEERS: "{{ wireguard.peers | to_json }}"
+  script: generate_subnets.py --peers '{{ wireguard.peers | to_json }}'
+  register: subnets_result
 
 - name: set generates subnets fact
   set_fact:
-    subnets: "{{ python_result.stdout | from_json }}"
+    subnets: "{{ subnets_result.stdout | from_json }}"
