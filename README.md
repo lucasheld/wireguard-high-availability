@@ -1,15 +1,26 @@
 # wg-high-availability
 
-## Configuration
+## Create infrastucture
 
-1. Create a Hetzner api token and insert it into `hetzner.api_token` in the file `group_vars/all`
-1. Create one floating ip and multiple servers (OS Image: `Debian 11`) at Hetzner
-1. Adjust the floating ip name and ip inside `hetzner.floating_ip` of the file `group_vars/all`
-1. Add all server ips to the `[servers]` section of the file `inventory/hosts.ini`
-1. Adjust the private key of the wireguard interface and the public key of the peer inside `wireguard.interface` of the file `group_vars/all`. The whole wireguard config file can be found at `roles/wireguard/templates/wg0.conf.j2` 
+1. Install terraform
+1. Create a Hetzner api token and export it as environment variable `HCLOUD_TOKEN`
+1. Adjust and apply the terraform configuration from the terraform folder
+```bash
+terraform apply
+```
 
 ## Installation
 
+1. Install ansible
+1. Create a Hetzner api token and insert it into `hetzner.api_token` of the file `group_vars/all`
+1. Adjust the floating ip names `hetzner.floating_ipv4` and `hetzner.floating_ipv6` (optional) of the file `group_vars/all`
+1. Create a wireguard private key and insert it into `wireguard.interface.private_key`
+```bash
+wg genkey
+```
+3. Adjust the peers inside `wireguard.peers` and `wireguard.custom_rules` (optional). The whole wireguard config file can be found at `roles/wireguard/templates/wg0.conf.j2`.
+4. Insert the Hetzner VM ips to the `[servers]` section of the file `inventory/hosts.ini`
+5. Run the ansible playbook:
 ```bash
 ansible-playbook setup-servers.yml -u root
 ```
