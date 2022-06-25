@@ -38,7 +38,7 @@ def get_args():
 
 def main():
     args = get_args()
-    
+
     server = HTTPServer(('', args.port), CustomRequestHandler)
     server.interface = args.interface
     server.serve_forever()
