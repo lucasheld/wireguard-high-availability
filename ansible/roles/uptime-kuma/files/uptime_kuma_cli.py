@@ -1,64 +1,156 @@
 #!/usr/bin/env python3
 import json
+import time
+
 import click
 import socketio
 from enum import Enum
 
 sio = socketio.Client()
 
+initial_data = {
+    "monitorList": None,
+    "notificationList": None,
+    "proxyList": None,
+    "statusPageList": None,
+    "heartbeatList": None,
+    "importantHeartbeatList": None,
+    "avgPing": None,
+    "uptime": None,
+    "heartbeat": None,
+    "info": None,
+}
+received_millis = -1
+
+
+# @sio.event
+# def connect():
+#     print('connection established')
+
 
 @sio.event
-def connect():
-    print('connection established')
+def monitorList(data):
+    global received_millis
+    received_millis = current_millis()
+    # print(f'monitorList:\n----\n{data}\n----\n')
+    # print("monitorList")
+    initial_data["monitorList"] = data
 
-
-# @sio.event
-# def monitorList(data):
-#     print(f'monitorList:\n----\n{data}\n----\n')
-
-# @sio.event
-# def notificationList(data):
-#     print(f'notificationList:\n----\n{data}\n----\n')
-
-# @sio.event
-# def proxyList(data):
-#     print(f'proxyList:\n----\n{data}\n----\n')
-
-# @sio.event
-# def statusPageList(data):
-#     print(f'statusPageList:\n----\n{data}\n----\n')
-
-# @sio.event
-# def heartbeatList(id, data, bool):
-#     print(f'heartbeatList:\n----\n{id}\n{data}\n{bool}\n----\n')
-
-# @sio.event
-# def importantHeartbeatList(id, data, bool):
-#     print(f'importantHeartbeatList:\n----\n{id}\n{data}\n{bool}\n----\n')
-
-# @sio.event
-# def avgPing(id, data):
-#     print(f'avgPing:\n----\n{id}\n{data}\n----\n')
-
-# @sio.event
-# def uptime(id, hours_24, days_30):
-#     print(f'uptime:\n----\n{id}\n{hours_24}\n{days_30}\n----\n')
-
-# @sio.event
-# def heartbeat(data):
-#     print(f'heartbeat:\n----\n{data}\n----\n')
-
-# @sio.event
-# def info(data):
-#     print(f'info:\n----\n{data}\n----\n')
-
-# @sio.on('*')
-# def catch_all(event, data):
-#     print(f'UNHANDLED: {event}:\n----\n{data}\n----\n')
 
 @sio.event
-def disconnect():
-    print('disconnected from server')
+def notificationList(data):
+    global received_millis
+    received_millis = current_millis()
+    # print(f'notificationList:\n----\n{data}\n----\n')
+    # print("notificationList")
+    initial_data["notificationList"] = data
+
+
+@sio.event
+def proxyList(data):
+    global received_millis
+    received_millis = current_millis()
+    # print(f'proxyList:\n----\n{data}\n----\n')
+    # print("proxyList")
+    initial_data["proxyList"] = data
+
+
+@sio.event
+def statusPageList(data):
+    global received_millis
+    received_millis = current_millis()
+    # print(f'statusPageList:\n----\n{data}\n----\n')
+    # print("statusPageList")
+    initial_data["statusPageList"] = data
+
+
+@sio.event
+def heartbeatList(id, data, bool):
+    global received_millis
+    received_millis = current_millis()
+    # print(f'heartbeatList:\n----\n{id}\n{data}\n{bool}\n----\n')
+    # print("heartbeatList")
+    if not initial_data["heartbeatList"]:
+        initial_data["heartbeatList"] = []
+    initial_data["heartbeatList"].append({
+        "id": id,
+        "data": data,
+        "bool": bool,
+    })
+
+
+@sio.event
+def importantHeartbeatList(id, data, b):
+    global received_millisool
+    received_millis = current_millis()
+    # print(f'importantHeartbeatList:\n----\n{id}\n{data}\n{bool}\n----\n')
+    # print("importantHeartbeatList")
+    if not initial_data["importantHeartbeatList"]:
+        initial_data["importantHeartbeatList"] = []
+    initial_data["importantHeartbeatList"].append({
+        "id": id,
+        "data": data,
+        "bool": bool,
+    })
+
+
+@sio.event
+def avgPing(id, data):
+    global received_millis
+    received_millis = current_millis()
+    # print(f'avgPing:\n----\n{id}\n{data}\n----\n')
+    # print("avgPing")
+    if not initial_data["avgPing"]:
+        initial_data["avgPing"] = []
+    initial_data["avgPing"].append({
+        "id": id,
+        "data": data,
+    })
+
+
+@sio.event
+def uptime(id, hours_24, days_30):
+    global received_millis
+    received_millis = current_millis()
+    # print(f'uptime:\n----\n{id}\n{hours_24}\n{days_30}\n----\n')
+    # print("uptime")
+    if not initial_data["uptime"]:
+        initial_data["uptime"] = []
+    initial_data["uptime"].append({
+        "id": id,
+        "hours_24": hours_24,
+        "days_30": days_30,
+    })
+
+
+@sio.event
+def heartbeat(data):
+    global received_millis
+    received_millis = current_millis()
+    # print(f'heartbeat:\n----\n{data}\n----\n')
+    # print("heartbeat")
+    if not initial_data["heartbeat"]:
+        initial_data["heartbeat"] = []
+    initial_data["heartbeat"].append(data)
+
+
+@sio.event
+def info(data):
+    global received_millis
+    received_millis = current_millis()
+    # print(f'info:\n----\n{data}\n----\n')
+    # print("info")
+    initial_data["info"] = data
+
+
+@sio.on('*')
+def catch_all(event, data):
+    print(f'UNHANDLED: {event}:\n----\n{data}\n----\n')
+
+
+# @sio.event
+# def disconnect():
+#     print('disconnected from server')
 
 
 # missing functions
@@ -71,19 +163,22 @@ def disconnect():
 # twoFAStatus
 # needSetup
 # setup
+
 # editMonitor
 # getMonitorList
 # getMonitor
+
 # getMonitorBeats
-# editTag
-# deleteTag
 # editMonitorTag
 # deleteMonitorTag
+
 # changePassword
 # getSettings
 # setSettings
-# checkApprise
 # uploadBackup
+
+# checkApprise
+
 # clearEvents
 # clearHeartbeats
 # clearStatistics
@@ -114,6 +209,14 @@ def delete_monitor(id_):
 
 def get_tags():
     return sio.call('getTags')
+
+
+def edit_tag(tag):
+    return sio.call('editTag', tag)
+
+
+def delete_tag(id_):
+    return sio.call('deleteTag', id_)
 
 
 def add_tag(color, name, value):
@@ -168,7 +271,7 @@ class NotificationType(str, Enum):
 
 
 def build_notification_data(
-        name: str, type: NotificationType, default: bool,
+        name: str, type_: NotificationType, default: bool,
         # # ALERTA
         # alertaApiEndpoint
         # alertaEnvironment
@@ -373,14 +476,51 @@ def add_monitor(
     return sio.call('add', data)
 
 
+class Settings(object):
+    def __init__(self, url, user, pass_):
+        self.url = url
+        self.user = user
+        self.pass_ = pass_
+
+
+def need_connection(func):
+    def inner(*args, **kwargs):
+        @click.pass_obj
+        def inner2(ctx):
+            url = ctx.url
+            user = ctx.user
+            pass_ = ctx.pass_
+
+            url = url.rstrip("/")
+            sio.connect(f'{url}/socket.io/')
+            login(user, pass_)
+        inner2()
+        func(*args, **kwargs)
+    return inner
+
+
+def current_millis():
+    return round(time.time() * 1000)
+
+
+def wait_for_event(event):
+    def inner(func):
+        def inner2(*args, **kwargs):
+            while initial_data[event] is None:
+                time.sleep(0.01)
+            time.sleep(0.01)  # wait for multiple messages
+            func(*args, **kwargs)
+        return inner2
+    return inner
+
+
 @click.group()
 @click.option("--url", required=True, help="The uptime-kuma webinterface url. Example: http://192.168.20.160:3001/")
 @click.option("--user", required=True, help="The uptime-kuma username.")
 @click.option("--pass", "pass_", required=True, help="The uptime-kuma password.")
-def cli(url, user, pass_):
-    url = url.rstrip("/")
-    sio.connect(f'{url}/socket.io/')
-    login(user, pass_)
+@click.pass_context
+def cli(ctx, url, user, pass_):
+    ctx.obj = Settings(url, user, pass_)
 
 
 @cli.group()
@@ -388,11 +528,19 @@ def monitor():
     pass
 
 
+@monitor.command("list")
+@need_connection
+@wait_for_event("monitorList")
+def info():
+    print(initial_data["monitorList"])
+
+
 @monitor.command("add")
 @click.argument("type_", metavar="type".upper(), type=str)
 @click.argument("name", type=str)
 @click.option("--url", type=str, help="Monitor url.")
 @click.option("--keyword", type=str, help="Monitor keyword.")
+@need_connection
 def monitor_add(type_, name, url, keyword):
     r = add_monitor(monitor_type=type_, friendly_name=name, url=url, keyword=keyword)
     print(r)
@@ -400,23 +548,198 @@ def monitor_add(type_, name, url, keyword):
 
 @monitor.command("pause")
 @click.argument("id_", metavar="id".upper(), type=int)
+@need_connection
 def monitor_pause(id_):
     r = pause_monitor(id_)
     print(r)
 
 
 @monitor.command("resume")
-@click.argument("id_", metavar="ID", type=int)
+@click.argument("id_", metavar="id".upper(), type=int)
+@need_connection
 def monitor_resume(id_):
     r = resume_monitor(id_)
     print(r)
 
 
 @monitor.command("delete")
-@click.argument("id_", metavar="ID", type=int)
+@click.argument("id_", metavar="id".upper(), type=int)
+@need_connection
 def monitor_delete(id_):
     r = delete_monitor(id_)
     print(r)
+
+
+@cli.group()
+def tag():
+    pass
+
+
+@tag.command("add")
+@click.argument("color", type=str)
+@click.argument("name", type=str)
+@click.argument("value", type=str)
+@need_connection
+def tag_add(color, name, value):
+    r = add_tag(color, name, value)
+    print(r)
+
+
+@tag.command("list")
+@need_connection
+def tag_list():
+    r = get_tags()
+    if not r["ok"]:
+        exit(1)
+    print(r["tags"])
+
+
+@tag.command("edit")
+@need_connection
+def tag_edit():
+    pass
+
+
+@tag.command("delete")
+@click.argument("id_", metavar="id".upper(), type=int)
+@need_connection
+def tag_delete(id_):
+    r = delete_monitor(id_)
+    print(r)
+
+
+@cli.group()
+def notification():
+    pass
+
+
+@notification.command("list")
+@need_connection
+@wait_for_event("notificationList")
+def info():
+    print(initial_data["notificationList"])
+
+
+@notification.command("add")
+@click.argument("name", type=str)
+@click.argument("type_", metavar="type".upper(), type=str)
+@click.argument("default", type=str)
+@click.option("--telegram_bot_token", type=str, help="Telegram Bot Token")
+@click.option("--telegram_chat_id", type=str, help="Telegram Chat ID")
+@need_connection
+def notification_add(
+        name, type_, default,
+        telegram_bot_token, telegram_chat_id
+):
+    r = add_notification(
+        name, type_, default,
+        telegram_bot_token=telegram_bot_token, telegram_chat_id=telegram_chat_id
+    )
+    print(r)
+
+
+@notification.command("edit")
+@click.argument("name", type=str)
+@click.argument("type_", metavar="type".upper(), type=str)
+@click.argument("default", type=str)
+@click.option("--telegram_bot_token", type=str, help="Telegram Bot Token")
+@click.option("--telegram_chat_id", type=str, help="Telegram Chat ID")
+@need_connection
+def notification_edit(
+        name, type_, default,
+        telegram_bot_token, telegram_chat_id
+):
+    r = edit_notification(
+        name, type_, default,
+        telegram_bot_token=telegram_bot_token, telegram_chat_id=telegram_chat_id
+    )
+    print(r)
+
+
+@notification.command("delete")
+@click.argument("id_", metavar="id".upper(), type=int)
+@need_connection
+def notification_delete(id_):
+    r = delete_notification(id_)
+    print(r)
+
+
+@cli.group()
+def proxy():
+    pass
+
+
+@proxy.command("list")
+@need_connection
+@wait_for_event("proxyList")
+def proxy_list():
+    print(initial_data["proxyList"])
+
+
+@proxy.command("add")
+@need_connection
+def tag_add():
+    r = add_proxy()
+    print(r)
+
+
+@cli.command("info")
+@need_connection
+@wait_for_event("info")
+def info():
+    print(initial_data["info"])
+
+
+@cli.group()
+def statuspage():
+    pass
+
+
+@statuspage.command("list")
+@need_connection
+@wait_for_event("statusPageList")
+def statuspage_list():
+    print(initial_data["statusPageList"])
+
+
+@cli.group()
+def heartbeat():
+    pass
+
+
+@heartbeat.command("list")
+@need_connection
+@wait_for_event("heartbeatList")
+def heartbeat_list():
+    print(initial_data["heartbeatList"])
+
+
+@heartbeat.command("listimportant")
+@need_connection
+@wait_for_event("importantHeartbeatList")
+def heartbeat_list_important():
+    print(initial_data["importantHeartbeatList"])
+
+
+@heartbeat.command("get")
+@need_connection
+@wait_for_event("heartbeat")
+def heartbeat_get():
+    print(initial_data["heartbeat"])
+
+
+@cli.command("avgping")
+@need_connection
+@wait_for_event("avgPing")
+def info():
+    print(initial_data["avgPing"])
+
+
+@cli.command("uptime")
+@need_connection
+@wait_for_event("uptime")
+def info():
+    print(initial_data["uptime"])
 
 
 @cli.result_callback()
