@@ -20,7 +20,6 @@ initial_data = {
     "heartbeat": None,
     "info": None,
 }
-received_millis = -1
 
 
 # @sio.event
@@ -30,8 +29,6 @@ received_millis = -1
 
 @sio.event
 def monitorList(data):
-    global received_millis
-    received_millis = current_millis()
     # print(f'monitorList:\n----\n{data}\n----\n')
     # print("monitorList")
     initial_data["monitorList"] = data
@@ -39,8 +36,6 @@ def monitorList(data):
 
 @sio.event
 def notificationList(data):
-    global received_millis
-    received_millis = current_millis()
     # print(f'notificationList:\n----\n{data}\n----\n')
     # print("notificationList")
     initial_data["notificationList"] = data
@@ -48,8 +43,6 @@ def notificationList(data):
 
 @sio.event
 def proxyList(data):
-    global received_millis
-    received_millis = current_millis()
     # print(f'proxyList:\n----\n{data}\n----\n')
     # print("proxyList")
     initial_data["proxyList"] = data
@@ -57,8 +50,6 @@ def proxyList(data):
 
 @sio.event
 def statusPageList(data):
-    global received_millis
-    received_millis = current_millis()
     # print(f'statusPageList:\n----\n{data}\n----\n')
     # print("statusPageList")
     initial_data["statusPageList"] = data
@@ -66,8 +57,6 @@ def statusPageList(data):
 
 @sio.event
 def heartbeatList(id, data, bool):
-    global received_millis
-    received_millis = current_millis()
     # print(f'heartbeatList:\n----\n{id}\n{data}\n{bool}\n----\n')
     # print("heartbeatList")
     if not initial_data["heartbeatList"]:
@@ -81,8 +70,6 @@ def heartbeatList(id, data, bool):
 
 @sio.event
 def importantHeartbeatList(id, data, b):
-    global received_millisool
-    received_millis = current_millis()
     # print(f'importantHeartbeatList:\n----\n{id}\n{data}\n{bool}\n----\n')
     # print("importantHeartbeatList")
     if not initial_data["importantHeartbeatList"]:
@@ -96,8 +83,6 @@ def importantHeartbeatList(id, data, b):
 
 @sio.event
 def avgPing(id, data):
-    global received_millis
-    received_millis = current_millis()
     # print(f'avgPing:\n----\n{id}\n{data}\n----\n')
     # print("avgPing")
     if not initial_data["avgPing"]:
@@ -110,8 +95,6 @@ def avgPing(id, data):
 
 @sio.event
 def uptime(id, hours_24, days_30):
-    global received_millis
-    received_millis = current_millis()
     # print(f'uptime:\n----\n{id}\n{hours_24}\n{days_30}\n----\n')
     # print("uptime")
     if not initial_data["uptime"]:
@@ -125,8 +108,6 @@ def uptime(id, hours_24, days_30):
 
 @sio.event
 def heartbeat(data):
-    global received_millis
-    received_millis = current_millis()
     # print(f'heartbeat:\n----\n{data}\n----\n')
     # print("heartbeat")
     if not initial_data["heartbeat"]:
@@ -136,8 +117,6 @@ def heartbeat(data):
 
 @sio.event
 def info(data):
-    global received_millis
-    received_millis = current_millis()
     # print(f'info:\n----\n{data}\n----\n')
     # print("info")
     initial_data["info"] = data
@@ -172,16 +151,9 @@ def catch_all(event, data):
 # editMonitorTag
 # deleteMonitorTag
 
-# changePassword
-# getSettings
-# setSettings
 # uploadBackup
 
 # checkApprise
-
-# clearEvents
-# clearHeartbeats
-# clearStatistics
 
 def login(username, password):
     return sio.call('login', {
@@ -207,6 +179,10 @@ def delete_monitor(id_):
     return sio.call('deleteMonitor', id_)
 
 
+def get_monitor_beats(id_, period):
+    return sio.call('getMonitorBeats', (id_, period))
+
+
 def get_tags():
     return sio.call('getTags')
 
@@ -229,7 +205,15 @@ def add_tag(color, name, value):
 
 
 def add_monitor_tag(tag_id, monitor_id, value):
-    return sio.call('addMonitorTag', tag_id, monitor_id, value)
+    return sio.call('addMonitorTag', (tag_id, monitor_id, value))
+
+
+def edit_monitor_tag(tag_id, monitor_id, value):
+    return sio.call('editMonitorTag', (tag_id, monitor_id, value))
+
+
+def delete_monitor_tag(tag_id, monitor_id, value):
+    return sio.call('deleteMonitorTag', (tag_id, monitor_id, value))
 
 
 class NotificationType(str, Enum):
@@ -316,12 +300,12 @@ def test_notification(*args, **kwargs):
 
 def add_notification(*args, **kwargs):
     data = build_notification_data(*args, **kwargs)
-    return sio.call('addNotification', data, None)
+    return sio.call('addNotification', (data, None))
 
 
 def edit_notification(id_: int, *args, **kwargs):
     data = build_notification_data(*args, **kwargs)
-    return sio.call('addNotification', data, id_)
+    return sio.call('addNotification', (data, id_))
 
 
 def delete_notification(id_: int):
@@ -350,7 +334,11 @@ def add_proxy():
     pass
 
 
-def add_monitor(
+def get_monitor(id_):
+    return sio.call('getMonitor', id_)
+
+
+def build_monitor_data(
         monitor_type: MonitorType,
         friendly_name: str,
         heartbeat_interval: int = 60,
@@ -472,8 +460,47 @@ def add_monitor(
             "sqlserverQuery": sqlserver_query,
         })
 
-    print(json.dumps(data))
+    return data
+
+
+def add_monitor(*args, **kwargs):
+    data = build_monitor_data(*args, **kwargs)
     return sio.call('add', data)
+
+
+def edit_monitor(id_, *args, **kwargs):
+    data = build_monitor_data(*args, **kwargs)
+    data.update({
+        "id": id_
+    })
+    return sio.call('editMonitor', data)
+
+
+def socket_clear_events():
+    return sio.call('clearEvents')
+
+
+def socket_clear_heartbeats():
+    return sio.call('clearHeartbeats')
+
+
+def socket_clear_statistics():
+    return sio.call('clearStatistics')
+
+
+def socket_settings_get():
+    return sio.call('getSettings')
+
+
+def socket_settings_set(data, password):
+    return sio.call('setSettings', (data, password))
+
+
+def socket_change_password(oldpass, newpass):
+    return sio.call('changePassword', {
+        "currentPassword": oldpass,
+        "newPassword": newpass,
+    })
 
 
 class Settings(object):
@@ -497,10 +524,6 @@ def need_connection(func):
         inner2()
         func(*args, **kwargs)
     return inner
-
-
-def current_millis():
-    return round(time.time() * 1000)
 
 
 def wait_for_event(event):
@@ -531,8 +554,16 @@ def monitor():
 @monitor.command("list")
 @need_connection
 @wait_for_event("monitorList")
-def info():
+def monitor_list():
     print(initial_data["monitorList"])
+
+
+@monitor.command("get")
+@click.argument("id_", metavar="id".upper(), type=int)
+@need_connection
+def monitor_get(id_):
+    r = get_monitor(id_)
+    print(r)
 
 
 @monitor.command("add")
@@ -543,6 +574,20 @@ def info():
 @need_connection
 def monitor_add(type_, name, url, keyword):
     r = add_monitor(monitor_type=type_, friendly_name=name, url=url, keyword=keyword)
+    print(r)
+
+
+@monitor.command("edit")
+@click.argument("id_", metavar="id".upper(), type=str)
+@click.option("--type", "type_", type=str)
+@click.option("--name", type=str)
+@click.option("--url", type=str, help="Monitor url.")
+@click.option("--keyword", type=str, help="Monitor keyword.")
+@need_connection
+def monitor_edit(id_, type_, name, url, keyword):
+    # Achtung! Alle nicht angegebenen Werte werden einfach gelöscht
+    # ToDo: umgehen, indem bestehender monitor geholt und mit den argumenten geupdated wird
+    r = edit_monitor(id_, monitor_type=type_, friendly_name=name, url=url, keyword=keyword)
     print(r)
 
 
@@ -567,6 +612,15 @@ def monitor_resume(id_):
 @need_connection
 def monitor_delete(id_):
     r = delete_monitor(id_)
+    print(r)
+
+
+@monitor.command("beats")
+@click.argument("id_", metavar="id".upper(), type=int)
+@click.argument("period", type=int)
+@need_connection
+def monitor_beats(id_, period):
+    r = get_monitor_beats(id_, period)
     print(r)
 
 
@@ -616,7 +670,7 @@ def notification():
 @notification.command("list")
 @need_connection
 @wait_for_event("notificationList")
-def info():
+def notification_list():
     print(initial_data["notificationList"])
 
 
@@ -678,7 +732,7 @@ def proxy_list():
 
 @proxy.command("add")
 @need_connection
-def tag_add():
+def proxy_add():
     r = add_proxy()
     print(r)
 
@@ -731,15 +785,106 @@ def heartbeat_get():
 @cli.command("avgping")
 @need_connection
 @wait_for_event("avgPing")
-def info():
+def avgping():
     print(initial_data["avgPing"])
 
 
 @cli.command("uptime")
 @need_connection
 @wait_for_event("uptime")
-def info():
+def uptime():
     print(initial_data["uptime"])
+
+
+@cli.group()
+def clear():
+    pass
+
+
+@clear.command("events")
+@need_connection
+def clear_events():
+    r = socket_clear_events()
+    print(r)
+
+
+@clear.command("heartbeats")
+@need_connection
+def clear_heartbeats():
+    r = socket_clear_heartbeats()
+    print(r)
+
+
+@clear.command("statistics")
+@need_connection
+def clear_statistics():
+    r = socket_clear_statistics()
+    print(r)
+
+
+@cli.group()
+def settings():
+    pass
+
+
+@settings.command("get")
+@need_connection
+def settings_get():
+    r = socket_settings_get()
+    print(r)
+
+
+@settings.command("set")
+@click.argument("data", type=str)
+@click.argument("password", type=str)
+@need_connection
+def settings_set(data, password):
+    r = socket_settings_set(data, password)
+    print(r)
+
+
+@settings.command("changepassword")
+@click.argument("oldpass", type=str)
+@click.argument("newpass", type=str)
+@need_connection
+def settings_changepassword(oldpass, newpass):
+    r = socket_change_password(oldpass, newpass)
+    print(r)
+
+
+@cli.group()
+def monitortag():
+    pass
+
+
+@monitortag.command("add")
+@click.argument("tag_id", type=str)
+@click.argument("monitor_id", type=str)
+@click.argument("value", type=str)
+@need_connection
+def monitortag_add(tag_id, monitor_id, value):
+    r = add_monitor_tag(tag_id, monitor_id, value)
+    print(r)
+
+
+@monitortag.command("edit")
+@click.argument("tag_id", type=str)
+@click.argument("monitor_id", type=str)
+@click.argument("value", type=str)
+@need_connection
+def monitortag_edit(tag_id, monitor_id, value):
+    r = edit_monitor_tag(tag_id, monitor_id, value)
+    print(r)
+
+
+@monitortag.command("delete")
+@click.argument("tag_id", type=str)
+@click.argument("monitor_id", type=str)
+@click.argument("value", type=str)
+@need_connection
+def monitortag_delete(tag_id, monitor_id, value):
+    r = delete_monitor_tag(tag_id, monitor_id, value)
+    print(r)
 
 
 @cli.result_callback()
