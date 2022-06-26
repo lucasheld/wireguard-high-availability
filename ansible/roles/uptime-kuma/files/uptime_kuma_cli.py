@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import json
 import time
 
 import click
@@ -238,58 +237,231 @@ class NotificationType(str, Enum):
     PAGERDUTY = "PagerDuty"
     PROMOSMS = "promosms"
     PUSHBULLET = "pushbullet"
-    PUSHBYTECHULUS = "PushByTechulus"
     PUSHDEER = "PushDeer"
     PUSHOVER = "pushover"
     PUSHY = "pushy"
-    ROCKET = "rocket.chat"
+    ROCKET_CHAT = "rocket.chat"
     SERWERSMS = "serwersms"
     SIGNAL = "signal"
     SLACK = "slack"
     SMTP = "smtp"
     STACKFIELD = "stackfield"
     TEAMS = "teams"
+    PUSHBYTECHULUS = "PushByTechulus"
     TELEGRAM = "telegram"
     WEBHOOK = "webhook"
     WECOM = "WeCom"
 
 
-def build_notification_data(
-        name: str, type_: NotificationType, default: bool,
-        # # ALERTA
-        # alertaApiEndpoint
-        # alertaEnvironment
-        # alertaApiKey
-        # alertaAlertState
-        # alertaRecoverState
-        # # AliyunSMS
-        # accessKeyId
-        # secretAccessKey
-        # phonenumber
-        # templateCode
-        # signName
-        # # APPRISE
-        # appriseURL
-        # title
-        # # BARK
-        # barkEndpoint
-        # # CLICKSENDSMS
-        # clicksendsmsLogin
-        # clicksendsmsPassword
-        # clicksendsmsToNumber
-        # clicksendsmsSenderName
-        # TELEGRAM
-        telegram_bot_token: str, telegram_chat_id: str,
-):
-    if type != NotificationType.TELEGRAM:
-        raise NotImplementedError()
+notification_provider_options = {
+    NotificationType.ALERTA: [
+        "alertaApiEndpoint",
+        "alertaApiKey",
+        "alertaEnvironment",
+        "alertaAlertState",
+        "alertaRecoverState",
+    ],
+    NotificationType.ALIYUNSMS: [
+        "phonenumber",
+        "templateCode",
+        "signName",
+        "accessKeyId",
+        "secretAccessKey",
+    ],
+    NotificationType.APPRISE: [
+        "appriseURL",
+        "title",
+    ],
+    NotificationType.BARK: [
+        "barkEndpoint",
+    ],
+    NotificationType.CLICKSENDSMS: [
+        "clicksendsmsLogin",
+        "clicksendsmsPassword",
+        "clicksendsmsToNumber",
+        "clicksendsmsSenderName",
+    ],
+    NotificationType.DINGDING: [
+        "webHookUrl",
+        "secretKey",
+    ],
+    NotificationType.DISCORD: [
+        "discordUsername",
+        "discordWebhookUrl",
+        "discordPrefixMessage",
+    ],
+    NotificationType.FEISHU: [
+        "feishuWebHookUrl",
+    ],
+    NotificationType.GOOGLECHAT: [
+        "googleChatWebhookURL",
+    ],
+    NotificationType.GORUSH: [
+        "gorushDeviceToken",
+        "gorushPlatform",
+        "gorushTitle",
+        "gorushPriority",
+        "gorushRetry",
+        "gorushTopic",
+        "gorushServerURL",
+    ],
+    NotificationType.GOTIFY: [
+        "gotifyserverurl",
+        "gotifyapplicationToken",
+        "gotifyPriority",
+    ],
+    NotificationType.LINE: [
+        "lineChannelAccessToken",
+        "lineUserID",
+    ],
+    NotificationType.LUNASEA: [
+        "lunaseaDevice",
+    ],
+    NotificationType.MATRIX: [
+        "internalRoomId",
+        "accessToken",
+        "homeserverUrl",
+    ],
+    NotificationType.MATTERMOST: [
+        "mattermostusername",
+        "mattermostWebhookUrl",
+        "mattermostchannel",
+        "mattermosticonemo",
+        "mattermosticonurl",
+    ],
+    NotificationType.NTFY: [
+        "ntfyserverurl",
+        "ntfytopic",
+        "ntfyPriority",
+    ],
+    NotificationType.OCTOPUSH: [
+        "octopushVersion",
+        "octopushAPIKey",
+        "octopushLogin",
+        "octopushPhoneNumber",
+        "octopushSMSType",
+        "octopushSenderName",
+        "octopushDMLogin",
+        "octopushDMAPIKey",
+        "octopushDMPhoneNumber",
+        "octopushDMSenderName",
+        "octopushDMSMSType",
+    ],
+    NotificationType.ONEBOT: [
+        "httpAddr",
+        "accessToken",
+        "msgType",
+        "recieverId",
+    ],
+    NotificationType.PAGERDUTY: [
+        "pagerdutyAutoResolve",
+        "pagerdutyIntegrationUrl",
+        "pagerdutyPriority",
+        "pagerdutyIntegrationKey",
+    ],
+    NotificationType.PROMOSMS: [
+        "promosmsLogin",
+        "promosmsPassword",
+        "promosmsPhoneNumber",
+        "promosmsSMSType",
+        "promosmsSenderName",
+    ],
+    NotificationType.PUSHBULLET: [
+        "pushbulletAccessToken",
+    ],
+    NotificationType.PUSHDEER: [
+        "pushdeerKey",
+    ],
+    NotificationType.PUSHOVER: [
+        "pushoveruserkey",
+        "pushoverapptoken",
+        "pushoversounds",
+        "pushoverpriority",
+        "pushovertitle",
+        "pushoverdevice",
+    ],
+    NotificationType.PUSHY: [
+        "pushyAPIKey",
+        "pushyToken",
+    ],
+    NotificationType.ROCKET_CHAT: [
+        "rocketchannel",
+        "rocketusername",
+        "rocketiconemo",
+        "rocketwebhookURL",
+        "rocketbutton",
+    ],
+    NotificationType.SERWERSMS: [
+        "serwersmsUsername",
+        "serwersmsPassword",
+        "serwersmsPhoneNumber",
+        "serwersmsSenderName",
+    ],
+    NotificationType.SIGNAL: [
+        "signalNumber",
+        "signalRecipients",
+        "signalURL",
+    ],
+    NotificationType.SLACK: [
+        "slackbutton",
+        "slackchannel",
+        "slackusername",
+        "slackiconemo",
+        "slackwebhookURL",
+        "slackbutton",
+    ],
+    NotificationType.SMTP: [
+        "smtpHost",
+        "smtpPort",
+        "smtpSecure",
+        "smtpIgnoreTLSError",
+        "smtpDkimDomain",
+        "smtpDkimKeySelector",
+        "smtpDkimPrivateKey",
+        "smtpDkimHashAlgo",
+        "smtpDkimheaderFieldNames",
+        "smtpDkimskipFields",
+        "smtpUsername",
+        "smtpPassword",
+        "customSubject",
+        "smtpFrom",
+        "smtpCC",
+        "smtpBCC",
+        "smtpTo",
+    ],
+    NotificationType.STACKFIELD: [
+        "stackfieldwebhookURL",
+    ],
+    NotificationType.TEAMS: [
+        "webhookUrl",
+    ],
+    NotificationType.PUSHBYTECHULUS: [
+        "pushAPIKey",
+    ],
+    NotificationType.TELEGRAM: [
+        "telegramBotToken",
+        "telegramChatID",
+    ],
+    NotificationType.WEBHOOK: [
+        "webhookContentType",
+        "webhookURL",
+    ],
+    NotificationType.WECOM: [
+        "weComBotKey",
+    ],
+}
 
+
+def build_notification_data(name: str, type_: NotificationType, default: bool, **kwargs):
+    kwargs_set = {}
+    for k, v in kwargs.items():
+        if v is not None:
+            kwargs_set[k] = v
     return {
         "name": name,
-        "type": type,
+        "type": type_,
         "isDefault": default,
-        "telegramBotToken": telegram_bot_token,
-        "telegramChatID": telegram_chat_id
+        **kwargs_set
     }
 
 
@@ -526,6 +698,14 @@ def need_connection(func):
     return inner
 
 
+def add_notification_options(func):
+    for type_, options in reversed(notification_provider_options.items()):
+        for option in reversed(options):
+            click_option = click.option(f"--{option}", option, type=str, help=f"{type_} - {option}")
+            func = click_option(func)
+    return func
+
+
 def wait_for_event(event):
     def inner(func):
         def inner2(*args, **kwargs):
@@ -674,21 +854,25 @@ def notification_list():
     print(initial_data["notificationList"])
 
 
+@notification.command("test")
+@click.argument("name", type=str)
+@click.argument("type_", metavar="type".upper(), type=str)
+@click.argument("default", type=str)
+@add_notification_options
+@need_connection
+def notification_add(name, type_, default, **kwargs):
+    r = test_notification(name, type_, default, **kwargs)
+    print(r)
+
+
 @notification.command("add")
 @click.argument("name", type=str)
 @click.argument("type_", metavar="type".upper(), type=str)
 @click.argument("default", type=str)
-@click.option("--telegram_bot_token", type=str, help="Telegram Bot Token")
-@click.option("--telegram_chat_id", type=str, help="Telegram Chat ID")
+@add_notification_options
 @need_connection
-def notification_add(
-        name, type_, default,
-        telegram_bot_token, telegram_chat_id
-):
-    r = add_notification(
-        name, type_, default,
-        telegram_bot_token=telegram_bot_token, telegram_chat_id=telegram_chat_id
-    )
+def notification_add(name, type_, default, **kwargs):
+    r = add_notification(name, type_, default, **kwargs)
     print(r)
 
 
@@ -696,17 +880,10 @@ def notification_add(
 @click.argument("name", type=str)
 @click.argument("type_", metavar="type".upper(), type=str)
 @click.argument("default", type=str)
-@click.option("--telegram_bot_token", type=str, help="Telegram Bot Token")
-@click.option("--telegram_chat_id", type=str, help="Telegram Chat ID")
+@add_notification_options
 @need_connection
-def notification_edit(
-        name, type_, default,
-        telegram_bot_token, telegram_chat_id
-):
-    r = edit_notification(
-        name, type_, default,
-        telegram_bot_token=telegram_bot_token, telegram_chat_id=telegram_chat_id
-    )
+def notification_edit(name, type_, default, **kwargs):
+    r = edit_notification(name, type_, default, **kwargs)
     print(r)
 
 
