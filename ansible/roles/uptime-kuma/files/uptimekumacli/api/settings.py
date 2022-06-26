@@ -1,4 +1,4 @@
-from uptimekumacli.events import sio
+from uptimekumacli import sio
 
 
 __all__ = ["socket_settings_get", "socket_settings_set", "socket_change_password"]

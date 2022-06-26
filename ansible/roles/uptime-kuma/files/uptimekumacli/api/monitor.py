@@ -1,5 +1,5 @@
 from uptimekumacli.data import MonitorType, AuthMethod
-from uptimekumacli.events import sio
+from uptimekumacli import sio
 
 __all__ = ["get_monitor", "add_monitor", "edit_monitor", "pause_monitor", "resume_monitor", "delete_monitor", "get_monitor_beats"]
 

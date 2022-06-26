@@ -1,4 +1,4 @@
-from uptimekumacli.events import sio
+from uptimekumacli import sio
 
 
 __all__ = ["add_monitor_tag", "edit_monitor_tag", "delete_monitor_tag"]

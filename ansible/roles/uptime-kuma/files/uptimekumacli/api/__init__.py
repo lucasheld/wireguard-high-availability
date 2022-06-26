@@ -1,3 +1,4 @@
+from . import events
 from .clear import *
 from .misc import *
 from .monitor import *

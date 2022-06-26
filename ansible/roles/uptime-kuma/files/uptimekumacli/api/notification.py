@@ -1,5 +1,5 @@
 from uptimekumacli.data import NotificationType
-from uptimekumacli.events import sio
+from uptimekumacli import sio
 
 __all__ = ["test_notification", "add_notification", "edit_notification", "delete_notification"]
 

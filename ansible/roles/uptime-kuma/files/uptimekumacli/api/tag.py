@@ -1,4 +1,4 @@
-from uptimekumacli.events import sio
+from uptimekumacli import sio
 
 
 __all__ = ["get_tags", "edit_tag", "delete_tag", "add_tag"]

@@ -1,4 +1,4 @@
-from uptimekumacli.events import sio
+from uptimekumacli import sio
 
 
 __all__ = ["connect", "disconnect", "login", "logout"]

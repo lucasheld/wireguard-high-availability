@@ -1,13 +1,15 @@
-from ._cli import cli  # this must be the first import
-from .avgping import avgping
-from .clear import clear
-from .heartbeat import heartbeat
-from .info import info
-from .monitor import monitor
-from .monitortag import monitortag
-from .notification import notification
-from .proxy import proxy
-from .settings import settings
-from .statuspage import statuspage
-from .tag import tag
-from .uptime import uptime
+# this must be the first import
+from .cli import cli
+
+from . import avgping
+from . import clear
+from . import heartbeat
+from . import info
+from . import monitor
+from . import monitortag
+from . import notification
+from . import proxy
+from . import settings
+from . import statuspage
+from . import tag
+from . import uptime
