@@ -1,16 +1,20 @@
 from uptimekumacli import sio
 
 
-__all__ = ["socket_clear_events", "socket_clear_heartbeats", "socket_clear_statistics"]
+__all__ = [
+    "clear_events",
+    "clear_heartbeats",
+    "clear_statistics"
+]
 
 
-def socket_clear_events():
+def clear_events():
     return sio.call('clearEvents')
 
 
-def socket_clear_heartbeats():
+def clear_heartbeats():
     return sio.call('clearHeartbeats')
 
 
-def socket_clear_statistics():
+def clear_statistics():
     return sio.call('clearStatistics')

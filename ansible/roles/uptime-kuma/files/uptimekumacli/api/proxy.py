@@ -1,4 +1,6 @@
-__all__ = ["add_proxy"]
+__all__ = [
+    "add_proxy"
+]
 
 
 def add_proxy():

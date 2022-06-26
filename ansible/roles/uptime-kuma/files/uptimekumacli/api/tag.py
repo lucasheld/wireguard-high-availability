@@ -1,7 +1,12 @@
 from uptimekumacli import sio
 
 
-__all__ = ["get_tags", "edit_tag", "delete_tag", "add_tag"]
+__all__ = [
+    "get_tags",
+    "edit_tag",
+    "delete_tag",
+    "add_tag"
+]
 
 
 def get_tags():

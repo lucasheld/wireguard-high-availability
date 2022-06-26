@@ -11,19 +11,19 @@ def clear():
 @clear.command("events")
 @need_connection
 def clear_events():
-    r = api.socket_clear_events()
+    r = api.clear_events()
     print(r)
 
 
 @clear.command("heartbeats")
 @need_connection
 def clear_heartbeats():
-    r = api.socket_clear_heartbeats()
+    r = api.clear_heartbeats()
     print(r)
 
 
 @clear.command("statistics")
 @need_connection
 def clear_statistics():
-    r = api.socket_clear_statistics()
+    r = api.clear_statistics()
     print(r)

@@ -1,7 +1,12 @@
 from uptimekumacli.data import NotificationType
 from uptimekumacli import sio
 
-__all__ = ["test_notification", "add_notification", "edit_notification", "delete_notification"]
+__all__ = [
+    "test_notification",
+    "add_notification",
+    "edit_notification",
+    "delete_notification"
+]
 
 
 def build_notification_data(name: str, type_: NotificationType, default: bool, **kwargs):

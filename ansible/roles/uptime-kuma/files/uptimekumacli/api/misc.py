@@ -1,7 +1,12 @@
 from uptimekumacli import sio
 
 
-__all__ = ["connect", "disconnect", "login", "logout"]
+__all__ = [
+    "connect",
+    "disconnect",
+    "login",
+    "logout"
+]
 
 
 def connect(url):

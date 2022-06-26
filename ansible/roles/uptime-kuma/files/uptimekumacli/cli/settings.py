@@ -13,7 +13,7 @@ def settings():
 @settings.command("get")
 @need_connection
 def settings_get():
-    r = api.socket_settings_get()
+    r = api.settings_get()
     print(r)
 
 
@@ -22,7 +22,7 @@ def settings_get():
 @click.argument("password", type=str)
 @need_connection
 def settings_set(data, password):
-    r = api.socket_settings_set(data, password)
+    r = api.settings_set(data, password)
     print(r)
 
 
@@ -31,5 +31,5 @@ def settings_set(data, password):
 @click.argument("newpass", type=str)
 @need_connection
 def settings_changepassword(oldpass, newpass):
-    r = api.socket_change_password(oldpass, newpass)
+    r = api.change_password(oldpass, newpass)
     print(r)

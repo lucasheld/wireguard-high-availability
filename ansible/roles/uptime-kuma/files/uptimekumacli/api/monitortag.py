@@ -1,7 +1,11 @@
 from uptimekumacli import sio
 
 
-__all__ = ["add_monitor_tag", "edit_monitor_tag", "delete_monitor_tag"]
+__all__ = [
+    "add_monitor_tag",
+    "edit_monitor_tag",
+    "delete_monitor_tag"
+]
 
 
 def add_monitor_tag(tag_id, monitor_id, value):
