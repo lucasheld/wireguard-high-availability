@@ -1,7 +1,7 @@
-import re
 import glob
-import jinja2
+import re
 
+import jinja2
 
 notification_providers = []
 
@@ -34,12 +34,12 @@ for path in glob.glob('uptime-kuma/server/notification-providers/*'):
 print(notification_providers)
 
 
-def write_to_file(filename, **kwargs):
+def write_to_file(template, destination, **kwargs):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader("./"))
-    template = env.get_template(f"{filename}.j2")
+    template = env.get_template(template)
     rendered = template.render(**kwargs)
-    with open(filename, "w") as f:
+    with open(destination, "w") as f:
         f.write(rendered)
 
 
-write_to_file("notification_providers.py", notification_providers=notification_providers)
+write_to_file("notification_providers.py.j2", "./../uptimekumacli/data/notification_providers.py", notification_providers=notification_providers)
