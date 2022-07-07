@@ -1,1 +1,21 @@
 ---
+- name: Start uptime-kuma docker container
+  community.docker.docker_container:
+    name: uptime-kuma
+    image: louislam/uptime-kuma:1
+    volumes:
+      - uptime-kuma:/app/data
+    ports:
+      - 3001:3001
+    restart_policy: always
+
+- name: Wait for uptime-kuma start
+  uri:
+    url: "http://localhost:3001/"
+    method: GET
+    return_content: yes
+  register: result
+  until: result.content != ""
+  retries: 30
+  delay: 1
+  failed_when: false

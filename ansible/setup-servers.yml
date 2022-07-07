@@ -32,3 +32,13 @@
 
     - include_role:
         name: wireguard
+
+    - include_role:
+        name: docker
+
+    - include_role:
+        name: uptime-kuma
+
+    - include_role:
+        name: uptime-kuma
+        tasks_from: configure

@@ -1,0 +1,38 @@
+---
+# TODO: remove extra-index-url
+- name: install uptime-kuma-api pip module
+  become: yes
+  ansible.builtin.pip:
+    extra_args: --extra-index-url https://test.pypi.org/simple
+    name: uptime-kuma-api
+
+- name: uptime-kuma setup
+  lucasheld.uptime_kuma.setup:
+    api_url: "{{ uptime_kuma.api_url }}"
+    api_username: "{{ uptime_kuma.api_username }}"
+    api_password: "{{ uptime_kuma.api_password }}"
+  register: result
+
+- name: add monitors for other servers
+  lucasheld.uptime_kuma.monitor:
+    api_url: "{{ uptime_kuma.api_url }}"
+    api_username: "{{ uptime_kuma.api_username }}"
+    api_password: "{{ uptime_kuma.api_password }}"
+    name: "Server {{ item }}"
+    type: keyword
+    url: "http://{{ item }}"
+    keyword: healthy
+    state: present
+  loop: "{{ groups.servers | difference([inventory_hostname]) }}"
+  # loop: "{{ groups.servers }}"
+
+- name: add monitors for wireguard peers
+  lucasheld.uptime_kuma.monitor:
+    api_url: "{{ uptime_kuma.api_url }}"
+    api_username: "{{ uptime_kuma.api_username }}"
+    api_password: "{{ uptime_kuma.api_password }}"
+    name: "Peer {{ item.1 | regex_replace('/\\d+$', '') }}"
+    type: ping
+    hostname: "{{ item.1 | regex_replace('/\\d+$', '') }}"
+    state: present
+  loop: "{{ wireguard.peers | subelements('allowed_ips') }}"
