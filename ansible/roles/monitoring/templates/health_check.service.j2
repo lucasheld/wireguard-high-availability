@@ -4,7 +4,7 @@ Description=wireguard health check
 [Service]
 Type=simple
 User=root
-ExecStart=/root/health_check.py --interface {{ wireguard.network_interface }}
+ExecStart=/root/health_check.py --interface wg0
 
 [Install]
 WantedBy=multi-user.target

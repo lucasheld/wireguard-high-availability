@@ -15,8 +15,6 @@ hetzner:
   # floating_ipv6: wireguard-floating-ipv6
 
 wireguard:
-  network_interface: wg0
-
   interface:
     private_key: !vault |
       $ANSIBLE_VAULT;1.1;AES256

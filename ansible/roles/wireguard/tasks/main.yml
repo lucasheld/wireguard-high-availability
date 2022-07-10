@@ -8,12 +8,17 @@
 
 - name: copy wireguard config
   ansible.builtin.template:
-    src: "{{ wireguard.network_interface }}.conf.j2"
-    dest: "/etc/wireguard/{{ wireguard.network_interface }}.conf"
+    src: wg0.conf.j2
+    dest: /etc/wireguard/wg0.conf
     mode: 0644
+  notify:
+    - restart wireguard
 
 - name: enable and start wireguard service
   ansible.builtin.systemd:
-    name: "wg-quick@{{ wireguard.network_interface }}.service"
+    name: wg-quick@wg0.service
     enabled: yes
     state: started
+
+# flush handlers to start triggered handlers before next task is executed
+- meta: flush_handlers

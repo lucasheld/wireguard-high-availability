@@ -39,3 +39,19 @@
   become: yes
   pip:
     name: docker
+
+- name: copy docker daemon.json
+  ansible.builtin.copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0644
+
+- name: apply docker ipv6 firewall rule
+  ansible.builtin.iptables:
+    ip_version: ipv6
+    table: nat
+    action: append
+    chain: POSTROUTING
+    source: fd00::/80
+    out_interface: "!docker0"
+    jump: MASQUERADE
