@@ -1,5 +1,5 @@
 [Interface]
-Address = 10.0.0.1/24, fdc9:281f:04d7:9ee9::1/64
+Address = 10.0.0.1/24, fdc9:281f:04d7:9ee9::1/112
 ListenPort = 51820
 PrivateKey = {{ wireguard.interface.private_key }}
 
@@ -28,6 +28,10 @@ PreUp = ip6tables -I OUTPUT -o wg0 -j wg0-filter6
 # allow already opened connections
 PreUp = iptables -A wg0-filter -m state --state ESTABLISHED,RELATED -j ACCEPT
 PreUp = ip6tables -A wg0-filter6 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# allow Uptime Kuma ping from wireguard server to all peers
+PreUp = iptables -A wg0-filter -d 10.0.0.0/16 ! -i wg0 -j ACCEPT
+PreUp = ip6tables -A wg0-filter6 -d fdc9:281f:4d7:9ee9::0:0/96 ! -i wg0 -j ACCEPT
 
 # allow requests within the same subnet
 {% for subnet in subnets %}
