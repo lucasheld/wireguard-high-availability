@@ -24,7 +24,6 @@
     keyword: healthy
     state: present
   loop: "{{ groups.servers | difference([inventory_hostname]) }}"
-  # loop: "{{ groups.servers }}"
 
 - name: add monitors for wireguard peers
   lucasheld.uptime_kuma.monitor:

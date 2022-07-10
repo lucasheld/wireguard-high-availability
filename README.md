@@ -12,6 +12,7 @@ terraform apply
 ## Installation
 
 1. Install ansible
+1. Run `ansible-galaxy install -r requirements.yml`
 1. Create a Hetzner api token and insert it into `hetzner.api_token` of the file `group_vars/all`
 1. Adjust the floating ip names `hetzner.floating_ipv4` and `hetzner.floating_ipv6` (optional) of the file `group_vars/all`
 1. Create a wireguard private key and insert it into `wireguard.interface.private_key`
@@ -39,5 +40,3 @@ wenn floating ip
 2a01:4f8:1c0c:a058::/64
 dann
 Endpoint = [2a01:4f8:1c0c:a058::]:51820
-
-

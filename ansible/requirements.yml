@@ -1,0 +1,9 @@
+---
+collections:
+  # - name: lucasheld.uptime_kuma
+  #   version: 1.0.0
+  #   type: galaxy
+  # - name: https://github.com/lucasheld/ansible-uptime-kuma.git
+  #   type: git
+  - source: /home/lucas/Projects/ansible-uptime-kuma
+    type: dir
