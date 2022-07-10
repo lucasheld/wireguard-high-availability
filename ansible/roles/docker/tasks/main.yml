@@ -45,6 +45,8 @@
     src: daemon.json
     dest: /etc/docker/daemon.json
     mode: 0644
+  notify:
+    - restart docker
 
 - name: apply docker ipv6 firewall rule
   ansible.builtin.iptables:
@@ -55,3 +57,6 @@
     source: fd00::/80
     out_interface: "!docker0"
     jump: MASQUERADE
+
+# flush handlers to start triggered handlers before next task is executed
+- meta: flush_handlers

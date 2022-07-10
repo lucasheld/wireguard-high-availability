@@ -22,6 +22,8 @@
     type: keyword
     url: "http://{{ item }}"
     keyword: healthy
+    heartbeat_interval: 20
+    heartbeat_retry_interval: 20
     state: present
   loop: "{{ groups.servers | difference([inventory_hostname]) }}"
 
@@ -33,5 +35,7 @@
     name: "Peer {{ item.1 | regex_replace('/\\d+$', '') }}"
     type: ping
     hostname: "{{ item.1 | regex_replace('/\\d+$', '') }}"
+    heartbeat_interval: 20
+    heartbeat_retry_interval: 20
     state: present
   loop: "{{ wireguard.peers | subelements('allowed_ips') }}"
