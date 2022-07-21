@@ -32,7 +32,36 @@ wireguard:
       allowed_ips:
         - 10.0.1.1/32
         - fdc9:281f:4d7:9ee9::1:1/128
-      
+      services:
+        # only tcp ports are monitored by uptime kuma
+        - name: HTTP Server
+          rules:
+            # protocols: all, tcp, udp, udplite, icmp, icmpv6, esp, ah, sctp, mh
+            - protocol: tcp
+              # ports are only allowed if protocol is tcp or udp
+              ports:
+                - 80
+                - 443
+          allowed_tags:
+            - http
+            - admin
+        - name: Ping
+          rules:
+            - protocol: icmp
+          allowed_tags:
+            - admin
+        - name: OpenVPN Server
+          rules:
+            - protocol: udp
+              ports:
+                - 1194
+            - protocol: tcp
+              ports:
+                - 1194
+          allowed_tags:
+            - openvpn
+            - admin
+
       # Example peer config:
       #
       # [Interface]
@@ -44,33 +73,56 @@ wireguard:
       # AllowedIPs = 10.0.0.0/16, fdc9:281f:04d7:9ee9::0:0/96
       # Endpoint = 116.202.189.178:51820
       # PersistentKeepalive = 21
-    
+
 
     - public_key: tdryaVAUBeUQVFZrC+VZun1Khru73h4AIKD+iFDgezQ=
       allowed_ips:
         - 10.0.1.2/32
         - fdc9:281f:4d7:9ee9::1:2/128
-    
+      tags:
+        - http
+        - openvpn
+
     - public_key: zvNURzqNS9r2IOEFNJBGOD5CCdXSPxMQQFchC+WXvi8=
       allowed_ips:
         - 10.0.2.1/32
         - fdc9:281f:4d7:9ee9::2:1/128
-    
+      tags:
+        - http
+
     - public_key: 8/OjfGoco0TVKX+vWw4u/h1BZjmtR0CusVbCZS3d7iY=
       allowed_ips:
         - 10.0.2.2/32
         - fdc9:281f:4d7:9ee9::2:2/128
+      tags:
+        - admin
 
   custom_rules:
+    # Protocol and ports are optional. If they are not specified, the traffic is allowed to all protocols and ports.
+
     # allow ipv4 and ipv6 traffic from one subnet to another
-    # for the reverse direction another rule is required
     - type: ipv4
       src: 10.0.1.0/24
       dst: 10.0.2.0/24
-    
     - type: ipv6
       src: fdc9:281f:4d7:9ee9::1:0/112
       dst: fdc9:281f:4d7:9ee9::2:0/112
+
+    # allow ipv4 and ipv6 traffic from one host to another on tcp port 80
+    - type: ipv4
+      src: 10.0.1.1
+      dst: 10.0.1.2
+      protocol: tcp
+      ports:
+        - 80
+        - 443
+    - type: ipv6
+      src: fdc9:281f:4d7:9ee9::1:1
+      dst: fdc9:281f:4d7:9ee9::1:2
+      protocol: tcp
+      ports:
+        - 80
+        - 443
 
 uptime_kuma:
   api_url: http://127.0.0.1:3001

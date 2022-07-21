@@ -28,7 +28,7 @@
 
     - include_role:
         name: wireguard
-        tasks_from: generate_subnets
+        tasks_from: generate_firewall_rules
 
     - include_role:
         name: wireguard

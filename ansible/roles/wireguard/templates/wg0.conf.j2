@@ -33,22 +33,14 @@ PreUp = ip6tables -A wg0-filter6 -m state --state ESTABLISHED,RELATED -j ACCEPT
 PreUp = iptables -A wg0-filter -d 10.0.0.0/16 ! -i wg0 -j ACCEPT
 PreUp = ip6tables -A wg0-filter6 -d fdc9:281f:4d7:9ee9::0:0/96 ! -i wg0 -j ACCEPT
 
-# allow requests within the same subnet
-{% for subnet in subnets %}
-{% if subnet.type == 'ipv4' %}
-PreUp = iptables -A wg0-filter -s {{ subnet.network }} -d {{ subnet.network }} -j ACCEPT
-{% elif subnet.type == 'ipv6' %}
-PreUp = ip6tables -A wg0-filter6 -s {{ subnet.network }} -d {{ subnet.network }} -j ACCEPT
-{% endif %}
+# allow requests based on tags and allowed tags
+{% for rule in wireguard_peer_firewall_rules %}
+PreUp = {{ rule }}
 {% endfor %}
 
 # allow requests based on custom rules
-{% for rule in wireguard.custom_rules %}
-{% if rule.type == 'ipv4' %}
-PreUp = iptables -A wg0-filter -s {{ rule.src }} -d {{ rule.dst }} -j ACCEPT
-{% elif rule.type == 'ipv6' %}
-PreUp = ip6tables -A wg0-filter6 -s {{ rule.src }} -d {{ rule.dst }} -j ACCEPT
-{% endif %}
+{% for rule in wireguard_custom_firewall_rules %}
+PreUp = {{ rule }}
 {% endfor %}
 
 # reject everything else
