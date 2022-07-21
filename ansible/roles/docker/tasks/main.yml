@@ -1,6 +1,5 @@
 ---
 - name: install requirements
-  become: yes
   apt:
     name:
       - ca-certificates
@@ -12,20 +11,17 @@
     update_cache: yes
 
 - name: add docker GPG key
-  become: yes
   apt_key:
     url: https://download.docker.com/linux/debian/gpg
     state: present
 
 - name: add docker repository
-  become: yes
   apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
     state: present
     mode: '0666'
 
 - name: install docker engine
-  become: yes
   apt:
     name:
       - docker-ce
@@ -36,7 +32,6 @@
     update_cache: yes
 
 - name: install docker pip module
-  become: yes
   pip:
     name: docker
 
@@ -48,15 +43,26 @@
   notify:
     - restart docker
 
-- name: apply docker ipv6 firewall rule
-  ansible.builtin.iptables:
+- name: copy docker ipv6 firewall rules
+  ansible.builtin.copy:
+    src: iptables_rules.v6
+    dest: /etc/iptables/rules_docker.v6
+    mode: 0644
+
+- name: restore docker ipv6 firewall rules
+  community.general.iptables_state:
     ip_version: ipv6
-    table: nat
-    action: append
-    chain: POSTROUTING
-    source: fd00::/80
-    out_interface: "!docker0"
-    jump: MASQUERADE
+    path: /etc/iptables/rules_docker.v6
+    noflush: true
+    state: restored
+  async: "{{ ansible_timeout }}"
+  poll: 0
+
+- name: Create cronjob to restore docker ipv6 firewall rules after reboot
+  ansible.builtin.cron:
+    name: "restore docker ipv6 firewall rules"
+    special_time: reboot
+    job: "/usr/sbin/ip6tables-restore --noflush < /etc/iptables/rules_docker.v6"
 
 # flush handlers to start triggered handlers before next task is executed
 - meta: flush_handlers
