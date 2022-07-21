@@ -1,10 +1,10 @@
 ---
 - name: generate wireguard peer firewall rules
-  script: generate_peer_services.py --peers '{{ wireguard.peers | to_json }}'
+  script: generate_firewall_rules.py --peers '{{ wireguard.peers | to_json }}'
   register: result_peer_rules
 
 - name: generate wireguard custom firewall rules
-  script: generate_peer_services.py --custom-rules '{{ wireguard.custom_rules | to_json }}'
+  script: generate_firewall_rules.py --custom-rules '{{ wireguard.custom_rules | default([], true) | to_json }}'
   register: result_custom_rules
 
 - name: set facts for generated firewall rules

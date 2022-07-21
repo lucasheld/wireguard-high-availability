@@ -58,7 +58,7 @@
   async: "{{ ansible_timeout }}"
   poll: 0
 
-- name: Create cronjob to restore docker ipv6 firewall rules after reboot
+- name: create cronjob to restore docker ipv6 firewall rules after reboot
   ansible.builtin.cron:
     name: "restore docker ipv6 firewall rules"
     special_time: reboot

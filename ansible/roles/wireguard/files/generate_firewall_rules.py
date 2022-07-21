@@ -15,6 +15,7 @@ def build_command(rule):
         cmd += f" -p {rule['protocol']}"
     if rule.get("port"):
         cmd += f" --dport {rule['port']}"
+    cmd += " -j ACCEPT"
     return cmd
 
 
