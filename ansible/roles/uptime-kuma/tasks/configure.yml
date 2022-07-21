@@ -39,3 +39,25 @@
     heartbeat_retry_interval: 20
     state: present
   loop: "{{ wireguard.peers | subelements('allowed_ips') }}"
+
+- name: generate wireguard peer firewall rules
+  script: generate_peer_services.py --peers '{{ wireguard.peers | to_json }}'
+  register: result
+
+- name: set facts for generated firewall rules
+  set_fact:
+    wireguard_peer_services: "{{ result.stdout | from_json }}"
+
+- name: add monitors for wireguard peer services
+  lucasheld.uptime_kuma.monitor:
+    api_url: "{{ uptime_kuma.api_url }}"
+    api_username: "{{ uptime_kuma.api_username }}"
+    api_password: "{{ uptime_kuma.api_password }}"
+    name: "Service {{ item.socket }}"
+    type: port
+    hostname: "{{ item.ip }}"
+    port: "{{ item.port }}"
+    heartbeat_interval: 20
+    heartbeat_retry_interval: 20
+    state: present
+  loop: "{{ wireguard_peer_services }}"
