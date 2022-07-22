@@ -12,6 +12,16 @@
     api_password: "{{ uptime_kuma.api_password }}"
   register: result
 
+- name: uptime kuma login
+  lucasheld.uptime_kuma.login:
+    api_url: "{{ uptime_kuma.api_url }}"
+    api_username: "{{ uptime_kuma.api_username }}"
+    api_password: "{{ uptime_kuma.api_password }}"
+  register: result
+
+- set_fact:
+    uptime_kuma_api_token: "{{ result.token }}"
+
 
 # add monitors for other servers
 
@@ -21,8 +31,7 @@
 - name: add monitors for other servers
   lucasheld.uptime_kuma.monitor:
     api_url: "{{ uptime_kuma.api_url }}"
-    api_username: "{{ uptime_kuma.api_username }}"
-    api_password: "{{ uptime_kuma.api_password }}"
+    api_token: "{{ uptime_kuma_api_token }}"
     name: "Server {{ item }}"
     type: keyword
     url: "http://{{ item }}"
@@ -44,8 +53,7 @@
 - name: add monitors for wireguard peers
   lucasheld.uptime_kuma.monitor:
     api_url: "{{ uptime_kuma.api_url }}"
-    api_username: "{{ uptime_kuma.api_username }}"
-    api_password: "{{ uptime_kuma.api_password }}"
+    api_token: "{{ uptime_kuma_api_token }}"
     name: "Peer {{ item }}"
     type: ping
     hostname: "{{ item }}"
@@ -71,8 +79,7 @@
 - name: add monitors for wireguard peer services
   lucasheld.uptime_kuma.monitor:
     api_url: "{{ uptime_kuma.api_url }}"
-    api_username: "{{ uptime_kuma.api_username }}"
-    api_password: "{{ uptime_kuma.api_password }}"
+    api_token: "{{ uptime_kuma_api_token }}"
     name: "Service {{ item.socket }}"
     type: port
     hostname: "{{ item.ip }}"
@@ -91,8 +98,7 @@
 - name: get all monitors
   lucasheld.uptime_kuma.monitor_info:
     api_url: "{{ uptime_kuma.api_url }}"
-    api_username: "{{ uptime_kuma.api_username }}"
-    api_password: "{{ uptime_kuma.api_password }}"
+    api_token: "{{ uptime_kuma_api_token }}"
   register: all_monitors
 
 - set_fact:
@@ -104,8 +110,7 @@
 - name: remove old monitors
   lucasheld.uptime_kuma.monitor:
     api_url: "{{ uptime_kuma.api_url }}"
-    api_username: "{{ uptime_kuma.api_username }}"
-    api_password: "{{ uptime_kuma.api_password }}"
+    api_token: "{{ uptime_kuma_api_token }}"
     name: "{{ item }}"
     state: absent
   loop: "{{ uptime_kuma_monitor_old_names }}"
