@@ -43,6 +43,13 @@
   notify:
     - restart docker
 
+- name: create directory /etc/iptables
+  file:
+    path: /etc/iptables
+    state: directory
+    mode: "u=rx,g=rx,o=rwx"
+    recurse: yes
+
 - name: copy docker ipv6 firewall rules
   ansible.builtin.copy:
     src: iptables_rules.v6
