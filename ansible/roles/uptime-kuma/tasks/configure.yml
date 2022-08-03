@@ -1,8 +1,6 @@
 ---
-# TODO: remove extra-index-url
 - name: install uptime-kuma-api pip module
   ansible.builtin.pip:
-    extra_args: --extra-index-url https://test.pypi.org/simple
     name: uptime-kuma-api
 
 - name: uptime-kuma setup
@@ -36,8 +34,8 @@
     type: keyword
     url: "http://{{ item }}"
     keyword: healthy
-    heartbeat_interval: 20
-    heartbeat_retry_interval: 20
+    interval: 20
+    retryInterval: 20
     state: present
   loop: "{{ wireguard_server_ips }}"
 
@@ -57,8 +55,8 @@
     name: "Peer {{ item }}"
     type: ping
     hostname: "{{ item }}"
-    heartbeat_interval: 20
-    heartbeat_retry_interval: 20
+    interval: 20
+    retryInterval: 20
     state: present
   loop: "{{ wireguard_peers_ips }}"
 
@@ -84,8 +82,8 @@
     type: port
     hostname: "{{ item.ip }}"
     port: "{{ item.port }}"
-    heartbeat_interval: 20
-    heartbeat_retry_interval: 20
+    interval: 20
+    retryInterval: 20
     state: present
   loop: "{{ wireguard_peer_services }}"
 
