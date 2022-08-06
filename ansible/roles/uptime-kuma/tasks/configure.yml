@@ -8,14 +8,12 @@
     api_url: "{{ uptime_kuma.api_url }}"
     api_username: "{{ uptime_kuma.api_username }}"
     api_password: "{{ uptime_kuma.api_password }}"
-  register: result
 
 - name: uptime kuma login
   lucasheld.uptime_kuma.login:
     api_url: "{{ uptime_kuma.api_url }}"
     api_username: "{{ uptime_kuma.api_username }}"
     api_password: "{{ uptime_kuma.api_password }}"
-  register: result
 
 - set_fact:
     uptime_kuma_api_token: "{{ result.token }}"
@@ -31,9 +29,8 @@
     api_url: "{{ uptime_kuma.api_url }}"
     api_token: "{{ uptime_kuma_api_token }}"
     name: "Server {{ item }}"
-    type: keyword
+    type: http
     url: "http://{{ item }}"
-    keyword: healthy
     interval: 20
     retryInterval: 20
     state: present
