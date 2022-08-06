@@ -30,42 +30,31 @@ wireguard:
   peers:
     - public_key: BE7nnqPQkPc9/1Q1XASpwYyjWFPf8gH01KnLWLRjym8=
       allowed_ips:
-        - 10.0.1.1/32
-        - fdc9:281f:4d7:9ee9::1:1/128
+        - 10.0.0.2/32
+        - fdc9:281f:4d7:9ee9::2/128
       services:
-        # only tcp ports are monitored by uptime kuma
-        - name: HTTP Server
-          rules:
-            # protocols: all, tcp, udp, udplite, icmp, icmpv6, esp, ah, sctp, mh
+        # only tcp ports are monitored by Uptime Kuma
+        # allowed protocols: all, tcp, udp, udplite, icmp, icmpv6, esp, ah, sctp, mh
+        # ports are only allowed if protocol is tcp or udp
+
+        # HTTP Server
+        - rules:
             - protocol: tcp
-              # ports are only allowed if protocol is tcp or udp
               ports:
                 - 80
                 - 443
           allowed_tags:
             - http
-            - admin
-        - name: Ping
-          rules:
+        # Ping
+        - rules:
             - protocol: icmp
           allowed_tags:
-            - admin
-        - name: OpenVPN Server
-          rules:
-            - protocol: udp
-              ports:
-                - 1194
-            - protocol: tcp
-              ports:
-                - 1194
-          allowed_tags:
-            - openvpn
-            - admin
+            - ping
 
       # Example peer config:
       #
       # [Interface]
-      # Address = 10.0.1.1/24, fdc9:281f:04d7:9ee9::1:1/112
+      # Address = 10.0.0.2/24, fdc9:281f:04d7:9ee9::2/112
       # PrivateKey = <PrivateKey of public_key>
 
       # [Peer]
@@ -77,56 +66,68 @@ wireguard:
 
     - public_key: tdryaVAUBeUQVFZrC+VZun1Khru73h4AIKD+iFDgezQ=
       allowed_ips:
-        - 10.0.1.2/32
-        - fdc9:281f:4d7:9ee9::1:2/128
+        - 10.0.0.3/32
+        - fdc9:281f:4d7:9ee9::3/128
       tags:
         - http
-        - openvpn
 
     - public_key: zvNURzqNS9r2IOEFNJBGOD5CCdXSPxMQQFchC+WXvi8=
       allowed_ips:
-        - 10.0.2.1/32
-        - fdc9:281f:4d7:9ee9::2:1/128
+        - 10.0.0.4/32
+        - fdc9:281f:4d7:9ee9::4/128
       tags:
-        - http
-
-    - public_key: 8/OjfGoco0TVKX+vWw4u/h1BZjmtR0CusVbCZS3d7iY=
-      allowed_ips:
-        - 10.0.2.2/32
-        - fdc9:281f:4d7:9ee9::2:2/128
-      tags:
-        - admin
+        - ping
 
   custom_rules:
-    # Protocol and ports are optional. If they are not specified, the traffic is allowed to all protocols and ports.
+    # Protocols and ports are optional. If not specified, all protocols and ports are allowed.
 
-    # allow ipv4 and ipv6 traffic from one subnet to another
+    # allow ping from client 10.0.0.4 to server 10.0.0.1
     - type: ipv4
-      src: 10.0.1.0/24
-      dst: 10.0.2.0/24
+      src: 10.0.0.4
+      dst: 10.0.0.1
+      protocol: icmp
     - type: ipv6
-      src: fdc9:281f:4d7:9ee9::1:0/112
-      dst: fdc9:281f:4d7:9ee9::2:0/112
+      src: fdc9:281f:4d7:9ee9::4
+      dst: fdc9:281f:4d7:9ee9::1
+      protocol: icmp
 
-    # allow ipv4 and ipv6 traffic from one host to another on tcp port 80
-    - type: ipv4
-      src: 10.0.1.1
-      dst: 10.0.1.2
-      protocol: tcp
-      ports:
-        - 80
-        - 443
-    - type: ipv6
-      src: fdc9:281f:4d7:9ee9::1:1
-      dst: fdc9:281f:4d7:9ee9::1:2
-      protocol: tcp
-      ports:
-        - 80
-        - 443
+#     # allow ipv4 and ipv6 traffic within one subnet
+#    - type: ipv4
+#      src: 10.0.1.0/24
+#      dst: 10.0.1.0/24
+#    - type: ipv6
+#      src: fdc9:281f:4d7:9ee9::1:0/112
+#      dst: fdc9:281f:4d7:9ee9::1:0/112
+
+#    # allow ping from one host to another
+#    - type: ipv4
+#      src: 10.0.2.1
+#      dst: 10.0.2.2
+#      protocol: icmp
+#    - type: ipv6
+#      src: fdc9:281f:4d7:9ee9::2:1
+#      dst: fdc9:281f:4d7:9ee9::2:2
+#      protocol: icmp
+
+#    # allow ipv4 and ipv6 traffic from one host to another on tcp port 80 and 443
+#    - type: ipv4
+#      src: 10.0.2.1
+#      dst: 10.0.2.2
+#      protocol: tcp
+#      ports:
+#        - 80
+#        - 443
+#    - type: ipv6
+#      src: fdc9:281f:4d7:9ee9::1:1
+#      dst: fdc9:281f:4d7:9ee9::1:2
+#      protocol: tcp
+#      ports:
+#        - 80
+#        - 443
 
 uptime_kuma:
   api_url: http://127.0.0.1:3001
-  api_username: lucas
+  api_username: admin
   api_password: !vault |
       $ANSIBLE_VAULT;1.1;AES256
       65393737386163653734353636343362656133313639333836313766613162346436383233353430
