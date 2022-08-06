@@ -14,6 +14,7 @@
     api_url: "{{ uptime_kuma.api_url }}"
     api_username: "{{ uptime_kuma.api_username }}"
     api_password: "{{ uptime_kuma.api_password }}"
+  register: result
 
 - set_fact:
     uptime_kuma_api_token: "{{ result.token }}"
