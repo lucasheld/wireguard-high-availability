@@ -60,7 +60,7 @@ The WireGuard server config, the iptables firewall rules and the Uptime Kuma mon
   - Replace `wireguard.interface.private_key` with a WireGuard private key.
     The key can be generated with the command:
     ```shell
-    wg genkey
+    $ wg genkey
     ```
   
   - Adjust each peer of `wireguard.peers`.
