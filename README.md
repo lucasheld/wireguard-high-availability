@@ -1,4 +1,4 @@
-# wg-high-availability
+#  wireguard-high-availability
 
 This project automatically creates a high available WireGuard cloud infrastructure using Terraform and Ansible.
 
