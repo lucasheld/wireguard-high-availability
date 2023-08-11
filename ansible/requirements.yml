@@ -1,4 +1,3 @@
 ---
 collections:
-  - name: https://github.com/lucasheld/ansible-uptime-kuma.git
-    type: git
+  - name: lucasheld.uptime_kuma
